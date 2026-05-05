@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Instagram } from "lucide-react";
+import { getSettings } from "@/lib/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,6 +116,15 @@ export default function Contact() {
                   </li>
                 ))}
               </ul>
+              <a
+                href={getSettings().instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-6 text-gold hover:text-cream transition-colors"
+              >
+                <Instagram size={20} />
+                <span className="text-sm font-medium">@tapizeando</span>
+              </a>
             </div>
             <div className="bg-gold/15 border border-gold/40 p-6 rounded-2xl">
               <p className="text-navy text-sm leading-relaxed">
