@@ -207,7 +207,7 @@ function FabricsAdmin() {
 
   const persist = (next: Fabric[]) => { setList(next); localStorage.setItem("tn_fabrics", JSON.stringify(next)); };
   const reset = () => { setEditingId(null); setForm({ nombre: "", categoria: "basico", color: "#c6a564", imagen: "", descripcion: "" }); };
-  const onFile = async (f?: File) => { if (!f) return; setForm((p) => ({ ...p, imagen: await fileToDataUrl(f) })); };
+  const onFile = async (f?: File) => { if (!f) return; const data = await fileToDataUrl(f); setForm((p) => ({ ...p, imagen: data })); };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -327,7 +327,7 @@ function GalleryAdmin() {
         </div>
         <div>
           <Label>Imagen</Label>
-          <Input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files?.[0]; if (f) setForm((p) => ({ ...p, imagen: await fileToDataUrl(f) })); }} />
+          <Input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const data = await fileToDataUrl(f); setForm((p) => ({ ...p, imagen: data })); }} />
         </div>
         {form.imagen && <img src={form.imagen} className="h-32 w-32 object-cover rounded border" alt="" />}
         <Button type="submit" variant="gold">Añadir a la galería</Button>
