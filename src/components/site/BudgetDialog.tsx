@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { generateBudgetPdf, buildBudgetNumber, type BudgetData } from "@/lib/generateBudgetPdf";
+import { getSettings } from "@/lib/settings";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Indica tu nombre").max(100),
@@ -18,7 +19,9 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   context: {
+    muebleKey: string;
     muebleLabel: string;
+    modalidad: "tapizado" | "funda";
     telaLabel: string;
     tejidoNombre?: string;
     metraje: number;
@@ -26,6 +29,30 @@ type Props = {
     base: number;
   };
 };
+
+export type SavedBudget = {
+  numero: string;
+  fecha: string;
+  cliente: { nombre: string; email: string; telefono?: string; direccion?: string };
+  muebleLabel: string;
+  telaLabel: string;
+  tejidoNombre?: string;
+  modalidad: "tapizado" | "funda";
+  metraje: number;
+  unidades: number;
+  base: number;
+  total: number;
+  estado: "pendiente" | "contactado" | "confirmado";
+};
+
+function persistBudget(b: SavedBudget) {
+  try {
+    const raw = localStorage.getItem("tn_budgets");
+    const list: SavedBudget[] = raw ? JSON.parse(raw) : [];
+    list.unshift(b);
+    localStorage.setItem("tn_budgets", JSON.stringify(list));
+  } catch { /* */ }
+}
 
 export default function BudgetDialog({ open, onOpenChange, context }: Props) {
   const [form, setForm] = useState({ nombre: "", email: "", telefono: "", direccion: "" });
@@ -37,7 +64,7 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
   const anticipo = +(total / 2).toFixed(2);
 
   const buildData = (): BudgetData => {
-    const iban = (typeof window !== "undefined" && localStorage.getItem("tn_iban")) || "Consultar con el taller";
+    const iban = getSettings().iban || "Consultar con el taller";
     const fecha = new Date().toLocaleDateString("es-ES");
     return {
       cliente: {
@@ -46,16 +73,14 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
         telefono: form.telefono.trim() || undefined,
         direccion: form.direccion.trim() || undefined,
       },
+      modalidad: context.modalidad,
       muebleLabel: context.muebleLabel,
       telaLabel: context.telaLabel,
       tejidoNombre: context.tejidoNombre,
       metraje: context.metraje,
       unidades: context.unidades,
       base: +context.base.toFixed(2),
-      iva,
-      total,
-      anticipo,
-      iban,
+      iva, total, anticipo, iban,
       numero: buildBudgetNumber(),
       fecha,
     };
@@ -73,27 +98,35 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
     return true;
   };
 
+  const saveAndPdf = () => {
+    const data = buildData();
+    persistBudget({
+      numero: data.numero, fecha: data.fecha, cliente: data.cliente,
+      muebleLabel: data.muebleLabel, telaLabel: data.telaLabel, tejidoNombre: data.tejidoNombre,
+      modalidad: data.modalidad, metraje: data.metraje, unidades: data.unidades,
+      base: data.base, total: data.total, estado: "pendiente",
+    });
+    return { data, doc: generateBudgetPdf(data) };
+  };
+
   const handleDownload = () => {
     if (!validate()) return;
-    const data = buildData();
-    const doc = generateBudgetPdf(data);
+    const { data, doc } = saveAndPdf();
     doc.save(`${data.numero}.pdf`);
     setSuccess(true);
   };
 
   const handleEmail = () => {
     if (!validate()) return;
-    const data = buildData();
-    const doc = generateBudgetPdf(data);
+    const { data, doc } = saveAndPdf();
     doc.save(`${data.numero}.pdf`);
-    toast.success(`Presupuesto enviado a ${data.cliente.email}. Recibirás una copia en breves.`);
+    toast.success(`Presupuesto enviado a ${data.cliente.email}.`);
     setSuccess(true);
   };
 
   const reset = () => {
     setForm({ nombre: "", email: "", telefono: "", direccion: "" });
-    setErrors({});
-    setSuccess(false);
+    setErrors({}); setSuccess(false);
   };
 
   return (
@@ -106,12 +139,8 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
 
         {success ? (
           <div className="rounded-lg border border-gold/40 bg-white p-5 text-center">
-            <p className="text-green-700 font-medium">
-              ✅ Presupuesto generado correctamente.
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Nos pondremos en contacto contigo para confirmar los detalles.
-            </p>
+            <p className="text-green-700 font-medium">✅ Presupuesto generado correctamente.</p>
+            <p className="text-sm text-muted-foreground mt-2">Nos pondremos en contacto contigo para confirmar los detalles.</p>
             <Button className="mt-4" variant="gold" onClick={() => onOpenChange(false)}>Cerrar</Button>
           </div>
         ) : (

@@ -8,6 +8,8 @@ import Process from "@/components/site/Process";
 import Testimonials from "@/components/site/Testimonials";
 import Contact from "@/components/site/Contact";
 import Footer from "@/components/site/Footer";
+import FAQ from "@/components/site/FAQ";
+import WhatsAppButton from "@/components/site/WhatsAppButton";
 import { useReveal } from "@/hooks/use-reveal";
 import { useEffect } from "react";
 
@@ -33,9 +35,11 @@ const Index = () => {
         <WhyUs />
         <Process />
         <Testimonials />
+        <FAQ />
         <Contact />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 };
