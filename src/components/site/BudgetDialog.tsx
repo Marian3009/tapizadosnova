@@ -27,6 +27,7 @@ type Props = {
     metraje: number;
     unidades: number;
     base: number;
+    composite?: string | null;
   };
 };
 
@@ -58,6 +59,7 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
   const [form, setForm] = useState({ nombre: "", email: "", telefono: "", direccion: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
+  const [includeImage, setIncludeImage] = useState(true);
 
   const iva = +(context.base * 0.21).toFixed(2);
   const total = +(context.base + iva).toFixed(2);
@@ -83,6 +85,7 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
       iva, total, anticipo, iban,
       numero: buildBudgetNumber(),
       fecha,
+      composite: includeImage && context.composite ? context.composite : undefined,
     };
   };
 
@@ -170,6 +173,18 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
               <div className="flex justify-between"><span>Total estimado (IVA inc.)</span><strong className="text-navy">{total.toLocaleString("es-ES", { minimumFractionDigits: 2 })} €</strong></div>
               <div className="flex justify-between text-muted-foreground"><span>Anticipo (50%)</span><span>{anticipo.toLocaleString("es-ES", { minimumFractionDigits: 2 })} €</span></div>
             </div>
+
+            {context.composite && (
+              <label className="flex items-center gap-2 text-sm text-navy cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={includeImage}
+                  onChange={(e) => setIncludeImage(e.target.checked)}
+                  className="w-4 h-4 accent-gold"
+                />
+                Incluir visualización del mueble con el tejido en el PDF
+              </label>
+            )}
 
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
               <Button variant="gold" onClick={handleDownload}>📄 Descargar PDF</Button>

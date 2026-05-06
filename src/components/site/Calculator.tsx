@@ -17,6 +17,8 @@ export default function Calculator() {
   const [fabrics, setFabrics] = useState<Fabric[]>([]);
   const [selectedFabricId, setSelectedFabricId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [composite, setComposite] = useState<string | null>(null);
+  const [includeInPdf, setIncludeInPdf] = useState(true);
 
   useEffect(() => {
     try {
@@ -147,7 +149,18 @@ export default function Calculator() {
         </div>
 
         {/* Visualizador de mueble + tejido */}
-        <FabricVisualizer presetFabric={selectedFabric ? { nombre: selectedFabric.nombre, imagen: selectedFabric.imagen } : null} />
+        <FabricVisualizer
+          presetFabric={selectedFabric ? { nombre: selectedFabric.nombre, imagen: selectedFabric.imagen } : null}
+          project={{
+            muebleLabel: mueble.label,
+            telaLabel: tela.label,
+            metraje: mueble.metraje,
+            base: (mueble.precio + mueble.metraje * tela.price) * qty,
+          }}
+          onCompositeChange={setComposite}
+          includeInPdf={includeInPdf}
+          onIncludeChange={setIncludeInPdf}
+        />
 
         <div className="reveal mt-8 flex justify-center">
           <Button variant="gold" size="lg" onClick={() => setOpen(true)} className="px-10">
@@ -168,6 +181,7 @@ export default function Calculator() {
           metraje: mueble.metraje,
           unidades: qty,
           base: (mueble.precio + mueble.metraje * tela.price) * qty,
+          composite: includeInPdf ? composite : null,
         }}
       />
     </section>
