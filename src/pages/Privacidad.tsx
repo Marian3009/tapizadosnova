@@ -80,6 +80,13 @@ export default function Privacidad() {
         };
       })(),
     });
+    if (window.location.hash) {
+      const el = document.querySelector(window.location.hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+    }
     window.scrollTo(0, 0);
   }, []);
 
