@@ -174,6 +174,18 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
               <div className="flex justify-between text-muted-foreground"><span>Anticipo (50%)</span><span>{anticipo.toLocaleString("es-ES", { minimumFractionDigits: 2 })} €</span></div>
             </div>
 
+            {context.composite && (
+              <label className="flex items-center gap-2 text-sm text-navy cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={includeImage}
+                  onChange={(e) => setIncludeImage(e.target.checked)}
+                  className="w-4 h-4 accent-gold"
+                />
+                Incluir visualización del mueble con el tejido en el PDF
+              </label>
+            )}
+
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
               <Button variant="gold" onClick={handleDownload}>📄 Descargar PDF</Button>
               <Button variant="outline-gold" onClick={handleEmail}>📧 Enviar al email</Button>
