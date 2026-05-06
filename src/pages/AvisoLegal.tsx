@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/site/Footer";
 import { applySeo } from "@/lib/seo";
+import { buildPageGraph, SITE_URL } from "@/lib/orgSchema";
 
 export default function AvisoLegal() {
   useEffect(() => {
@@ -10,29 +11,15 @@ export default function AvisoLegal() {
       description:
         "Aviso Legal de Tapizados Nova conforme a la LSSI-CE: datos identificativos del titular, condiciones de uso, propiedad intelectual y legislación aplicable.",
       path: "/aviso-legal",
-      jsonLd: {
-        "@context": "https://schema.org",
+      jsonLd: buildPageGraph({
         "@type": "WebPage",
+        "@id": `${SITE_URL}/aviso-legal#page`,
         name: "Aviso Legal",
         inLanguage: "es-ES",
-        url: `${window.location.origin}/aviso-legal`,
+        url: `${SITE_URL}/aviso-legal`,
         about: "Aviso legal y condiciones de uso del sitio web",
-        publisher: {
-          "@type": "Organization",
-          name: "Tapizados Nova",
-          email: "tapizadosnova@gmail.com",
-          telephone: "+34611491661",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "Calle Bilbao N1, 1ª planta",
-            postalCode: "08191",
-            addressLocality: "Rubí",
-            addressRegion: "Barcelona",
-            addressCountry: "ES",
-          },
-        },
         dateModified: "2026-05-01",
-      },
+      }),
     });
     window.scrollTo(0, 0);
   }, []);
