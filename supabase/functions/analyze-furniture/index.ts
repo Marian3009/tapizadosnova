@@ -7,8 +7,40 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// Tamaño máximo de cada imagen base64 (~6 MB de datos crudos)
+const MAX_IMAGE_BASE64_BYTES = 8 * 1024 * 1024;
+
+// Rate limit en memoria por IP: 5 peticiones / 60s
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+const ipHits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const arr = (ipHits.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (arr.length >= RATE_LIMIT_MAX) {
+    ipHits.set(ip, arr);
+    return true;
+  }
+  arr.push(now);
+  ipHits.set(ip, arr);
+  return false;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return new Response(JSON.stringify({ error: "rate_limit" }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const { furnitureBase64, furnitureMime, fabricBase64, fabricMime } = await req.json();
@@ -19,8 +51,26 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (
+      typeof furnitureBase64 !== "string" ||
+      typeof fabricBase64 !== "string" ||
+      furnitureBase64.length > MAX_IMAGE_BASE64_BYTES ||
+      fabricBase64.length > MAX_IMAGE_BASE64_BYTES
+    ) {
+      return new Response(JSON.stringify({ error: "payload_too_large" }), {
+        status: 413,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
+      return new Response(JSON.stringify({ error: "internal_error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const furnitureUrl = `data:${furnitureMime || "image/jpeg"};base64,${furnitureBase64}`;
     const fabricUrl = `data:${fabricMime || "image/jpeg"};base64,${fabricBase64}`;
@@ -70,7 +120,6 @@ Genera UNA SOLA imagen final donde el mueble de la primera foto aparece tapizado
     }
 
     const data = await aiRes.json();
-    // Buscar imagen en la respuesta (varias posibles ubicaciones)
     const msg = data?.choices?.[0]?.message;
     let imageUrl: string | null = null;
     const images = msg?.images;
@@ -104,7 +153,7 @@ Genera UNA SOLA imagen final donde el mueble de la primera foto aparece tapizado
     });
   } catch (e) {
     console.error("retapizar error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
+    return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
