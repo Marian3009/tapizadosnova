@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Footer from "@/components/site/Footer";
 import { applySeo } from "@/lib/seo";
 import { buildPageGraph, SITE_URL } from "@/lib/orgSchema";
@@ -39,6 +39,7 @@ const cookieFaqs = [
 
 
 export default function Privacidad() {
+  const { hash } = useLocation();
   useEffect(() => {
     applySeo({
       title: "Política de Privacidad · Tapizados Nova",
@@ -80,15 +81,17 @@ export default function Privacidad() {
         };
       })(),
     });
-    if (window.location.hash) {
-      const el = document.querySelector(window.location.hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
+    if (hash) {
+      // Defer to next frame so the DOM is ready (also handles in-app SPA nav)
+      requestAnimationFrame(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.scrollTo(0, 0);
+      });
+      return;
     }
     window.scrollTo(0, 0);
-  }, []);
+  }, [hash]);
 
   return (
     <div className="min-h-screen bg-background">
