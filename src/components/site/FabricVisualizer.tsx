@@ -65,25 +65,6 @@ function UploadZone({
   );
 }
 
-function MiniPreview({ image, label, onClear }: { image: string; label: string; onClear: () => void }) {
-  return (
-    <div className="flex items-center gap-3 rounded-lg bg-cream/95 border border-gold/40 px-3 py-2">
-      <img src={image} alt={label} className="w-12 h-12 rounded object-cover" />
-      <div className="flex-1 min-w-0">
-        <p className="text-navy text-sm font-medium truncate">✅ {label}</p>
-      </div>
-      <button
-        type="button"
-        onClick={onClear}
-        className="w-7 h-7 rounded-full bg-navy/80 hover:bg-navy text-cream flex items-center justify-center"
-        aria-label="Eliminar"
-      >
-        <X size={14} />
-      </button>
-    </div>
-  );
-}
-
 export default function FabricVisualizer({ presetFabric, project, onCompositeChange, includeInPdf, onIncludeChange }: Props) {
   const [furniture, setFurniture] = useState<string | null>(null);
   const [fabric, setFabric] = useState<string | null>(null);
@@ -91,6 +72,8 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
   const [composite, setComposite] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [failed, setFailed] = useState(false);
+  const fInput = useRef<HTMLInputElement>(null);
+  const tInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (presetFabric?.imagen && !fabric) {
@@ -112,51 +95,95 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
     (async () => {
       try {
         const [imgM, imgT] = await Promise.all([loadImg(furniture), loadImg(fabric)]);
-        const canvas = document.createElement("canvas");
-        const maxW = 1200;
+
+        // Scale base to max 1400px
+        const maxW = 1400;
         const scale = imgM.naturalWidth > maxW ? maxW / imgM.naturalWidth : 1;
-        canvas.width = Math.round(imgM.naturalWidth * scale);
-        canvas.height = Math.round(imgM.naturalHeight * scale);
-        const ctx = canvas.getContext("2d")!;
+        const W = Math.round(imgM.naturalWidth * scale);
+        const H = Math.round(imgM.naturalHeight * scale);
 
-        // Base furniture
-        ctx.drawImage(imgM, 0, 0, canvas.width, canvas.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+        ctx.drawImage(imgM, 0, 0, W, H);
+        const imageData = ctx.getImageData(0, 0, W, H);
+        const data = imageData.data;
 
-        // Tile fabric onto an offscreen canvas at canvas size
-        const fabricCanvas = document.createElement("canvas");
-        fabricCanvas.width = canvas.width;
-        fabricCanvas.height = canvas.height;
-        const fctx = fabricCanvas.getContext("2d")!;
-        const tile = Math.max(180, Math.round(canvas.width / 5));
+        // Build tiled fabric pattern at canvas size
+        const tileCanvas = document.createElement("canvas");
+        tileCanvas.width = W;
+        tileCanvas.height = H;
+        const tctx = tileCanvas.getContext("2d")!;
+        // Scale tile so fabric repeats nicely (target ~ W/4)
+        const targetTile = Math.max(160, Math.round(W / 4));
         const ratio = imgT.naturalWidth / imgT.naturalHeight;
-        const tileW = tile;
-        const tileH = Math.round(tile / ratio);
-        for (let y = 0; y < canvas.height; y += tileH) {
-          for (let x = 0; x < canvas.width; x += tileW) {
-            fctx.drawImage(imgT, x, y, tileW, tileH);
+        const tileW = targetTile;
+        const tileH = Math.round(targetTile / ratio);
+        for (let y = 0; y < H; y += tileH) {
+          for (let x = 0; x < W; x += tileW) {
+            tctx.drawImage(imgT, x, y, tileW, tileH);
           }
         }
+        const fabricData = tctx.getImageData(0, 0, W, H).data;
 
-        // Overlay blend
-        ctx.save();
-        ctx.globalCompositeOperation = "overlay";
-        ctx.globalAlpha = 0.55;
-        ctx.drawImage(fabricCanvas, 0, 0);
-        ctx.restore();
+        // Background detection: edge-flood approximation via color similarity to corners
+        // Sample corner colors as background reference
+        const samples: Array<[number, number, number]> = [];
+        const sampleAt = (x: number, y: number) => {
+          const i = (y * W + x) * 4;
+          samples.push([data[i], data[i + 1], data[i + 2]]);
+        };
+        const step = 8;
+        for (let x = 0; x < W; x += Math.max(1, Math.floor(W / step))) {
+          sampleAt(x, 0);
+          sampleAt(x, H - 1);
+        }
+        for (let y = 0; y < H; y += Math.max(1, Math.floor(H / step))) {
+          sampleAt(0, y);
+          sampleAt(W - 1, y);
+        }
 
-        // Soft-light second pass
-        ctx.save();
-        ctx.globalCompositeOperation = "soft-light";
-        ctx.globalAlpha = 0.35;
-        ctx.drawImage(fabricCanvas, 0, 0);
-        ctx.restore();
+        const isBgColor = (r: number, g: number, b: number) => {
+          // Bright/white-ish backgrounds
+          if (r > 232 && g > 232 && b > 232) return true;
+          // Match any sample within tolerance
+          for (const [sr, sg, sb] of samples) {
+            const dr = r - sr, dg = g - sg, db = b - sb;
+            if (dr * dr + dg * dg + db * db < 22 * 22) return true;
+          }
+          return false;
+        };
 
-        // Recover shadows/volume from original
-        ctx.save();
-        ctx.globalCompositeOperation = "luminosity";
-        ctx.globalAlpha = 0.25;
-        ctx.drawImage(imgM, 0, 0, canvas.width, canvas.height);
-        ctx.restore();
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          if (isBgColor(r, g, b)) continue; // keep background untouched
+
+          // Luminosity of furniture pixel (preserves shadows/folds)
+          const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+
+          const tr = fabricData[i];
+          const tg = fabricData[i + 1];
+          const tb = fabricData[i + 2];
+
+          // Apply fabric color modulated by furniture luminosity, with slight boost
+          const k = 1.35;
+          let nr = tr * lum * k;
+          let ng = tg * lum * k;
+          let nb = tb * lum * k;
+
+          // Blend a touch of original to preserve highlights/edges
+          const mix = 0.18;
+          nr = nr * (1 - mix) + r * mix;
+          ng = ng * (1 - mix) + g * mix;
+          nb = nb * (1 - mix) + b * mix;
+
+          data[i] = Math.max(0, Math.min(255, nr));
+          data[i + 1] = Math.max(0, Math.min(255, ng));
+          data[i + 2] = Math.max(0, Math.min(255, nb));
+        }
+
+        ctx.putImageData(imageData, 0, 0);
 
         const url = canvas.toDataURL("image/jpeg", 0.92);
         if (!cancelled) {
@@ -209,64 +236,50 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
 
   return (
     <div className="mt-8 space-y-6 reveal">
-      {!both ? (
+      {!both && (
         <div className="grid md:grid-cols-2 gap-5">
-          {furniture ? (
-            <MiniPreview image={furniture} label="Mueble subido" onClear={() => setFurniture(null)} />
-          ) : (
+          <UploadZone
+            title="📷 Sube la foto de tu mueble"
+            hint="Formatos aceptados: JPG, PNG. Máximo 10MB"
+            icon={Camera}
+            onFile={handleFile((s) => setFurniture(s))}
+            inputId="upload-furniture"
+          />
+          <div>
             <UploadZone
-              title="📷 Sube la foto de tu mueble"
-              hint="Formatos aceptados: JPG, PNG. Máximo 10MB"
-              icon={Camera}
-              onFile={handleFile(setFurniture)}
-              inputId="upload-furniture"
-            />
-          )}
-          {fabric ? (
-            <div>
-              <MiniPreview image={fabric} label="Tejido subido" onClear={() => { setFabric(null); setPresetUsed(false); }} />
-              {presetUsed && (
-                <p className="text-gold/80 text-xs mt-2">✓ Tejido del catálogo aplicado automáticamente</p>
-              )}
-            </div>
-          ) : (
-            <UploadZone
-              title="🎨 Sube una foto del tejido elegido"
-              hint="Puedes subir una muestra o una imagen del tejido que te guste"
+              title="🎨 Sube una foto del tejido"
+              hint="Una muestra o imagen del tejido elegido"
               icon={Palette}
-              onFile={handleFile(setFabric)}
+              onFile={handleFile((s) => { setFabric(s); setPresetUsed(false); })}
               inputId="upload-fabric"
             />
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-wrap gap-3 justify-center text-cream/70 text-xs">
-          <span className="px-3 py-1 rounded-full bg-navy-deep/60 border border-gold/30">✅ Mueble cargado</span>
-          <span className="px-3 py-1 rounded-full bg-navy-deep/60 border border-gold/30">✅ Tejido cargado</span>
+            {presetUsed && fabric && (
+              <p className="text-gold/80 text-xs mt-2">✓ Tejido del catálogo precargado</p>
+            )}
+          </div>
         </div>
       )}
-
-      {(furniture && !fabric) || (!furniture && fabric) ? (
-        <div className="rounded-xl bg-navy-deep/60 border border-gold/20 p-5 text-center text-cream/70 text-sm">
-          Sube también la foto del {!fabric ? "tejido" : "mueble"} para ver la visualización
-        </div>
-      ) : null}
 
       {both && processing && (
         <div className="rounded-2xl bg-navy-deep/80 border-2 border-gold/40 p-10 flex flex-col items-center gap-3 text-cream">
           <Loader2 className="animate-spin text-gold" size={32} />
-          <p className="text-sm">⏳ Generando visualización...</p>
+          <p className="text-sm">⏳ Analizando imágenes y generando visualización...</p>
         </div>
       )}
 
       {both && failed && !processing && (
         <div className="rounded-xl bg-navy-deep/60 border border-gold/30 p-5 text-center text-cream/80 text-sm">
           No ha sido posible generar la visualización. Puedes continuar con el presupuesto igualmente.
+          <div className="mt-3">
+            <Button variant="outline-gold" onClick={resetImages}>
+              <RotateCcw size={16} className="mr-2" /> Reintentar
+            </Button>
+          </div>
         </div>
       )}
 
       {both && composite && !processing && (
-        <div className="animate-fade-in mx-auto md:w-[90%]">
+        <div className="animate-fade-in mx-auto md:w-[92%]">
           <div className="text-center mb-5">
             <h3 className="font-display text-2xl md:text-3xl text-gold">🛋️ Vista final de tu proyecto</h3>
             <p className="text-cream/60 text-sm mt-1">Así quedará tu mueble con el tejido seleccionado</p>
@@ -285,11 +298,47 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
                 <div><span className="text-navy/70">Precio estimado:</span> <strong className="text-gold">{Math.round(project.base).toLocaleString("es-ES")} € (sin IVA)</strong></div>
               </div>
             )}
+
+            {/* Mini thumbnails of originals with "Cambiar" actions */}
+            <div className="mt-5 flex items-center gap-4 justify-center sm:justify-start">
+              <button
+                type="button"
+                onClick={() => fInput.current?.click()}
+                className="group flex flex-col items-center gap-1"
+                title="Cambiar mueble"
+              >
+                <img src={furniture!} alt="Mueble" className="w-14 h-14 rounded-md object-cover border border-gold/40 group-hover:border-gold" />
+                <span className="text-cream/60 text-[11px] group-hover:text-gold">Cambiar</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => tInput.current?.click()}
+                className="group flex flex-col items-center gap-1"
+                title="Cambiar tejido"
+              >
+                <img src={fabric!} alt="Tejido" className="w-14 h-14 rounded-md object-cover border border-gold/40 group-hover:border-gold" />
+                <span className="text-cream/60 text-[11px] group-hover:text-gold">Cambiar</span>
+              </button>
+              <input
+                ref={fInput}
+                type="file"
+                accept="image/jpeg,image/png"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(setFurniture)(f); }}
+              />
+              <input
+                ref={tInput}
+                type="file"
+                accept="image/jpeg,image/png"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile((s) => { setFabric(s); setPresetUsed(false); })(f); }}
+              />
+            </div>
           </div>
 
           <div className="mt-5 flex flex-col sm:flex-row sm:justify-end gap-3">
             <Button variant="gold" onClick={downloadComposite}>
-              <Download size={18} className="mr-2" /> Descargar
+              <Download size={18} className="mr-2" /> Descargar resultado
             </Button>
             {onIncludeChange && (
               <Button
@@ -301,11 +350,11 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
               </Button>
             )}
             <Button variant="outline-gold" onClick={resetImages}>
-              <RotateCcw size={18} className="mr-2" /> Cambiar imagen
+              <RotateCcw size={18} className="mr-2" /> Repetir
             </Button>
           </div>
           <p className="text-cream/50 text-xs mt-3 text-center sm:text-right">
-            Visualización orientativa. El resultado final puede variar según el tejido y el trabajo de tapizado en taller.
+            Visualización generada por IA. El resultado final en taller puede variar según el tejido y el tipo de tapizado.
           </p>
         </div>
       )}
