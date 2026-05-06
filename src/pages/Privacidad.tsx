@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Footer from "@/components/site/Footer";
 import { applySeo } from "@/lib/seo";
 import { buildPageGraph, SITE_URL } from "@/lib/orgSchema";
