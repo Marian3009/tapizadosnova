@@ -15,6 +15,7 @@ export type BudgetData = {
   iban: string;
   numero: string;
   fecha: string;
+  composite?: string;
 };
 
 const NAVY: [number, number, number] = [42, 48, 60];
