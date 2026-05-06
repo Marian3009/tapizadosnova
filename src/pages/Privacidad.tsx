@@ -3,6 +3,40 @@ import { Link } from "react-router-dom";
 import Footer from "@/components/site/Footer";
 import { applySeo } from "@/lib/seo";
 import { buildPageGraph, SITE_URL } from "@/lib/orgSchema";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const cookieFaqs = [
+  {
+    q: "¿Qué son las cookies y para qué se utilizan en este sitio?",
+    a: "Las cookies son pequeños archivos de texto que se almacenan en su dispositivo al visitar una web. En tapizadosnova.com solo se emplean cookies técnicas estrictamente necesarias para el correcto funcionamiento del sitio (sesión, preferencias de idioma y seguridad). No se utilizan cookies publicitarias ni de perfilado.",
+  },
+  {
+    q: "¿Necesito aceptar cookies para navegar por la web?",
+    a: "No. Las cookies técnicas están exentas del deber de consentimiento conforme al artículo 22.2 de la LSSI-CE y a las directrices de la AEPD, ya que son imprescindibles para que el sitio funcione. No se instalarán cookies analíticas o de marketing sin su consentimiento previo y expreso.",
+  },
+  {
+    q: "¿Cómo puedo gestionar o eliminar las cookies desde mi navegador?",
+    a: "Puede configurar, bloquear o eliminar las cookies en cualquier momento desde los ajustes de su navegador. Cada navegador ofrece su propio panel: Chrome (Configuración → Privacidad y seguridad → Cookies), Firefox (Preferencias → Privacidad), Safari (Preferencias → Privacidad) y Edge (Configuración → Cookies y permisos). Tenga en cuenta que desactivar las cookies técnicas puede afectar al funcionamiento del sitio.",
+  },
+  {
+    q: "¿Se transfieren mis datos a terceros mediante cookies?",
+    a: "No. Al usarse únicamente cookies técnicas propias, no se realizan transferencias de datos a terceros con fines comerciales o publicitarios. Si en el futuro se incorporasen cookies de terceros, se solicitaría su consentimiento previo y se actualizaría esta política.",
+  },
+  {
+    q: "¿Cuánto tiempo permanecen las cookies en mi dispositivo?",
+    a: "Las cookies de sesión se eliminan automáticamente al cerrar el navegador. Las cookies persistentes técnicas, en su caso, tienen una duración máxima de 12 meses, tras la cual se eliminan o se renuevan.",
+  },
+  {
+    q: "¿Cómo puedo retirar mi consentimiento o reclamar?",
+    a: "Puede retirar su consentimiento o ejercer sus derechos escribiendo a tapizadosnova@gmail.com. Asimismo, tiene derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es) si considera que el tratamiento de sus datos no se ajusta a la normativa vigente.",
+  },
+];
+
 
 export default function Privacidad() {
   useEffect(() => {
@@ -11,20 +45,40 @@ export default function Privacidad() {
       description:
         "Política de Privacidad de Tapizados Nova conforme al RGPD y la LOPDGDD: responsable, finalidad, legitimación, conservación y derechos del usuario.",
       path: "/privacidad",
-      jsonLd: buildPageGraph(
-        {
-          "@type": "PrivacyPolicy",
-          "@id": `${SITE_URL}/privacidad#page`,
-          name: "Política de Privacidad",
-          inLanguage: "es-ES",
-          url: `${SITE_URL}/privacidad`,
-          dateModified: "2026-05-01",
-        },
-        [
-          { name: "Inicio", path: "/" },
-          { name: "Política de Privacidad", path: "/privacidad" },
-        ],
-      ),
+      jsonLd: (() => {
+        const base = buildPageGraph(
+          {
+            "@type": "PrivacyPolicy",
+            "@id": `${SITE_URL}/privacidad#page`,
+            name: "Política de Privacidad",
+            inLanguage: "es-ES",
+            url: `${SITE_URL}/privacidad`,
+            dateModified: "2026-05-01",
+            hasPart: { "@id": `${SITE_URL}/privacidad#cookies-faq` },
+          },
+          [
+            { name: "Inicio", path: "/" },
+            { name: "Política de Privacidad", path: "/privacidad" },
+          ],
+        );
+        return {
+          ...base,
+          "@graph": [
+            ...base["@graph"],
+            {
+              "@type": "FAQPage",
+              "@id": `${SITE_URL}/privacidad#cookies-faq`,
+              name: "Preguntas frecuentes sobre cookies",
+              inLanguage: "es-ES",
+              mainEntity: cookieFaqs.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
+            },
+          ],
+        };
+      })(),
     });
     window.scrollTo(0, 0);
   }, []);
@@ -134,6 +188,28 @@ export default function Privacidad() {
               funcionamiento. No se utilizan cookies de seguimiento publicitario sin el
               consentimiento previo del usuario.
             </p>
+          </section>
+
+          <section id="cookies-faq" className="scroll-mt-24">
+            <h2 className="font-display text-2xl text-navy-deep mt-10 mb-2">
+              9. Preguntas frecuentes sobre cookies
+            </h2>
+            <p className="mb-4">
+              Resolvemos las dudas más habituales sobre el uso y la gestión de cookies en
+              este sitio web.
+            </p>
+            <Accordion type="single" collapsible className="w-full">
+              {cookieFaqs.map((f, i) => (
+                <AccordionItem key={i} value={`item-${i}`}>
+                  <AccordionTrigger className="text-left font-medium text-navy-deep">
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-foreground/80">
+                    {f.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </section>
         </div>
       </main>
