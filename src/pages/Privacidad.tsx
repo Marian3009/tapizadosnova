@@ -189,6 +189,28 @@ export default function Privacidad() {
               consentimiento previo del usuario.
             </p>
           </section>
+
+          <section id="cookies-faq" className="scroll-mt-24">
+            <h2 className="font-display text-2xl text-navy-deep mt-10 mb-2">
+              9. Preguntas frecuentes sobre cookies
+            </h2>
+            <p className="mb-4">
+              Resolvemos las dudas más habituales sobre el uso y la gestión de cookies en
+              este sitio web.
+            </p>
+            <Accordion type="single" collapsible className="w-full">
+              {cookieFaqs.map((f, i) => (
+                <AccordionItem key={i} value={`item-${i}`}>
+                  <AccordionTrigger className="text-left font-medium text-navy-deep">
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-foreground/80">
+                    {f.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
         </div>
       </main>
 
