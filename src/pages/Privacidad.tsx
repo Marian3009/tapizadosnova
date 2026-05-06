@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/site/Footer";
 import { applySeo } from "@/lib/seo";
+import { buildPageGraph, SITE_URL } from "@/lib/orgSchema";
 
 export default function Privacidad() {
   useEffect(() => {
@@ -10,28 +11,14 @@ export default function Privacidad() {
       description:
         "Política de Privacidad de Tapizados Nova conforme al RGPD y la LOPDGDD: responsable, finalidad, legitimación, conservación y derechos del usuario.",
       path: "/privacidad",
-      jsonLd: {
-        "@context": "https://schema.org",
+      jsonLd: buildPageGraph({
         "@type": "PrivacyPolicy",
+        "@id": `${SITE_URL}/privacidad#page`,
         name: "Política de Privacidad",
         inLanguage: "es-ES",
-        url: `${window.location.origin}/privacidad`,
-        publisher: {
-          "@type": "Organization",
-          name: "Tapizados Nova",
-          email: "tapizadosnova@gmail.com",
-          telephone: "+34611491661",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "Calle Bilbao N1, 1ª planta",
-            postalCode: "08191",
-            addressLocality: "Rubí",
-            addressRegion: "Barcelona",
-            addressCountry: "ES",
-          },
-        },
+        url: `${SITE_URL}/privacidad`,
         dateModified: "2026-05-01",
-      },
+      }),
     });
     window.scrollTo(0, 0);
   }, []);
