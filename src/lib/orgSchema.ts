@@ -59,12 +59,25 @@ export const organizationJsonLd = {
   ],
 };
 
-export function buildPageGraph(pageNode: Record<string, unknown>) {
+export function buildBreadcrumb(items: { name: string; path: string }[]) {
   return {
-    "@context": "https://schema.org",
-    "@graph": [
-      organizationJsonLd,
-      { ...pageNode, publisher: { "@id": ORG_ID }, isPartOf: { "@id": ORG_ID } },
-    ],
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      item: `${SITE_URL}${it.path}`,
+    })),
   };
 }
+
+export function buildPageGraph(
+  pageNode: Record<string, unknown>,
+  breadcrumb?: { name: string; path: string }[],
+) {
+  const graph: Record<string, unknown>[] = [organizationJsonLd];
+  if (breadcrumb && breadcrumb.length) graph.push(buildBreadcrumb(breadcrumb));
+  graph.push({ ...pageNode, publisher: { "@id": ORG_ID }, isPartOf: { "@id": ORG_ID } });
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+

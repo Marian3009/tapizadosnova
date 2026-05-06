@@ -11,14 +11,20 @@ export default function Privacidad() {
       description:
         "Política de Privacidad de Tapizados Nova conforme al RGPD y la LOPDGDD: responsable, finalidad, legitimación, conservación y derechos del usuario.",
       path: "/privacidad",
-      jsonLd: buildPageGraph({
-        "@type": "PrivacyPolicy",
-        "@id": `${SITE_URL}/privacidad#page`,
-        name: "Política de Privacidad",
-        inLanguage: "es-ES",
-        url: `${SITE_URL}/privacidad`,
-        dateModified: "2026-05-01",
-      }),
+      jsonLd: buildPageGraph(
+        {
+          "@type": "PrivacyPolicy",
+          "@id": `${SITE_URL}/privacidad#page`,
+          name: "Política de Privacidad",
+          inLanguage: "es-ES",
+          url: `${SITE_URL}/privacidad`,
+          dateModified: "2026-05-01",
+        },
+        [
+          { name: "Inicio", path: "/" },
+          { name: "Política de Privacidad", path: "/privacidad" },
+        ],
+      ),
     });
     window.scrollTo(0, 0);
   }, []);
