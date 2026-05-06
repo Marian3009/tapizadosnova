@@ -39,6 +39,7 @@ const cookieFaqs = [
 
 
 export default function Privacidad() {
+  const { hash } = useLocation();
   useEffect(() => {
     applySeo({
       title: "Política de Privacidad · Tapizados Nova",
