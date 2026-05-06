@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, Download, Palette, FileText, RotateCcw } from "lucide-react";
+import { Camera, X, Download, Palette, FileText, RotateCcw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -22,63 +22,64 @@ function UploadZone({
   title,
   hint,
   icon: Icon,
-  image,
   onFile,
-  onClear,
   inputId,
 }: {
   title: string;
   hint: string;
   icon: typeof Camera;
-  image: string | null;
   onFile: (f: File) => void;
-  onClear: () => void;
   inputId: string;
 }) {
   const [drag, setDrag] = useState(false);
   return (
     <div>
       <h4 className="font-display text-xl text-cream mb-3">{title}</h4>
-      {!image ? (
-        <label
-          htmlFor={inputId}
-          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
-          onDragLeave={() => setDrag(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDrag(false);
-            const f = e.dataTransfer.files?.[0];
+      <label
+        htmlFor={inputId}
+        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          const f = e.dataTransfer.files?.[0];
+          if (f) onFile(f);
+        }}
+        className={`flex flex-col items-center justify-center text-center cursor-pointer rounded-xl bg-cream py-10 px-4 border-2 border-dashed transition-colors ${drag ? "border-gold bg-gold/10" : "border-gold/60 hover:border-gold"}`}
+      >
+        <Icon className="text-gold mb-3" size={36} />
+        <p className="text-navy font-medium text-sm">Arrastra tu foto aquí o haz clic para seleccionar</p>
+        <p className="text-navy/50 text-xs mt-1">{hint}</p>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/jpeg,image/png"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
             if (f) onFile(f);
           }}
-          className={`flex flex-col items-center justify-center text-center cursor-pointer rounded-xl bg-cream py-10 px-4 border-2 border-dashed transition-colors ${drag ? "border-gold bg-gold/10" : "border-gold/60 hover:border-gold"}`}
-        >
-          <Icon className="text-gold mb-3" size={36} />
-          <p className="text-navy font-medium text-sm">Arrastra tu foto aquí o haz clic para seleccionar</p>
-          <p className="text-navy/50 text-xs mt-1">{hint}</p>
-          <input
-            id={inputId}
-            type="file"
-            accept="image/jpeg,image/png"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) onFile(f);
-            }}
-          />
-        </label>
-      ) : (
-        <div className="relative rounded-xl overflow-hidden shadow-md border border-gold/30">
-          <img src={image} alt="Preview" className="w-full max-h-64 object-cover" />
-          <button
-            type="button"
-            onClick={onClear}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-navy/80 hover:bg-navy text-cream flex items-center justify-center transition-colors"
-            aria-label="Eliminar"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
+        />
+      </label>
+    </div>
+  );
+}
+
+function MiniPreview({ image, label, onClear }: { image: string; label: string; onClear: () => void }) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg bg-cream/95 border border-gold/40 px-3 py-2">
+      <img src={image} alt={label} className="w-12 h-12 rounded object-cover" />
+      <div className="flex-1 min-w-0">
+        <p className="text-navy text-sm font-medium truncate">✅ {label}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="w-7 h-7 rounded-full bg-navy/80 hover:bg-navy text-cream flex items-center justify-center"
+        aria-label="Eliminar"
+      >
+        <X size={14} />
+      </button>
     </div>
   );
 }
@@ -88,6 +89,8 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
   const [fabric, setFabric] = useState<string | null>(null);
   const [presetUsed, setPresetUsed] = useState(false);
   const [composite, setComposite] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     if (presetFabric?.imagen && !fabric) {
@@ -96,38 +99,76 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
     }
   }, [presetFabric, fabric]);
 
-  // Build composite when both images available
   useEffect(() => {
     let cancelled = false;
     if (!furniture || !fabric) {
       setComposite(null);
+      setFailed(false);
       onCompositeChange?.(null);
       return;
     }
+    setProcessing(true);
+    setFailed(false);
     (async () => {
       try {
-        const [img1, img2] = await Promise.all([loadImg(furniture), loadImg(fabric)]);
+        const [imgM, imgT] = await Promise.all([loadImg(furniture), loadImg(fabric)]);
         const canvas = document.createElement("canvas");
         const maxW = 1200;
-        const scale = img1.naturalWidth > maxW ? maxW / img1.naturalWidth : 1;
-        canvas.width = Math.round(img1.naturalWidth * scale);
-        canvas.height = Math.round(img1.naturalHeight * scale);
+        const scale = imgM.naturalWidth > maxW ? maxW / imgM.naturalWidth : 1;
+        canvas.width = Math.round(imgM.naturalWidth * scale);
+        canvas.height = Math.round(imgM.naturalHeight * scale);
         const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img1, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 0.7;
-        ctx.globalCompositeOperation = "multiply";
-        const pattern = ctx.createPattern(img2, "repeat");
-        if (pattern) {
-          ctx.fillStyle = pattern;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Base furniture
+        ctx.drawImage(imgM, 0, 0, canvas.width, canvas.height);
+
+        // Tile fabric onto an offscreen canvas at canvas size
+        const fabricCanvas = document.createElement("canvas");
+        fabricCanvas.width = canvas.width;
+        fabricCanvas.height = canvas.height;
+        const fctx = fabricCanvas.getContext("2d")!;
+        const tile = Math.max(180, Math.round(canvas.width / 5));
+        const ratio = imgT.naturalWidth / imgT.naturalHeight;
+        const tileW = tile;
+        const tileH = Math.round(tile / ratio);
+        for (let y = 0; y < canvas.height; y += tileH) {
+          for (let x = 0; x < canvas.width; x += tileW) {
+            fctx.drawImage(imgT, x, y, tileW, tileH);
+          }
         }
-        const url = canvas.toDataURL("image/jpeg", 0.9);
+
+        // Overlay blend
+        ctx.save();
+        ctx.globalCompositeOperation = "overlay";
+        ctx.globalAlpha = 0.55;
+        ctx.drawImage(fabricCanvas, 0, 0);
+        ctx.restore();
+
+        // Soft-light second pass
+        ctx.save();
+        ctx.globalCompositeOperation = "soft-light";
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(fabricCanvas, 0, 0);
+        ctx.restore();
+
+        // Recover shadows/volume from original
+        ctx.save();
+        ctx.globalCompositeOperation = "luminosity";
+        ctx.globalAlpha = 0.25;
+        ctx.drawImage(imgM, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+        const url = canvas.toDataURL("image/jpeg", 0.92);
         if (!cancelled) {
           setComposite(url);
           onCompositeChange?.(url);
+          setProcessing(false);
         }
       } catch {
-        /* */
+        if (!cancelled) {
+          setFailed(true);
+          setProcessing(false);
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -160,71 +201,72 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
     setFabric(null);
     setPresetUsed(false);
     setComposite(null);
+    setFailed(false);
     onCompositeChange?.(null);
   };
 
-  const both = furniture && fabric;
-  const onlyOne = (furniture && !fabric) || (!furniture && fabric);
+  const both = !!(furniture && fabric);
 
   return (
     <div className="mt-8 space-y-6 reveal">
-      <div className="grid md:grid-cols-2 gap-5">
-        <UploadZone
-          title="📷 Sube la foto de tu mueble"
-          hint="Formatos aceptados: JPG, PNG. Máximo 10MB"
-          icon={Camera}
-          image={furniture}
-          onFile={handleFile(setFurniture)}
-          onClear={() => setFurniture(null)}
-          inputId="upload-furniture"
-        />
-        <div>
-          <UploadZone
-            title="🎨 Sube una foto del tejido elegido"
-            hint="Puedes subir una muestra o una imagen del tejido que te guste"
-            icon={Palette}
-            image={fabric}
-            onFile={handleFile(setFabric)}
-            onClear={() => { setFabric(null); setPresetUsed(false); }}
-            inputId="upload-fabric"
-          />
-          {presetUsed && fabric && (
-            <p className="text-gold/80 text-xs mt-2">✓ Tejido del catálogo aplicado automáticamente</p>
+      {!both ? (
+        <div className="grid md:grid-cols-2 gap-5">
+          {furniture ? (
+            <MiniPreview image={furniture} label="Mueble subido" onClear={() => setFurniture(null)} />
+          ) : (
+            <UploadZone
+              title="📷 Sube la foto de tu mueble"
+              hint="Formatos aceptados: JPG, PNG. Máximo 10MB"
+              icon={Camera}
+              onFile={handleFile(setFurniture)}
+              inputId="upload-furniture"
+            />
+          )}
+          {fabric ? (
+            <div>
+              <MiniPreview image={fabric} label="Tejido subido" onClear={() => { setFabric(null); setPresetUsed(false); }} />
+              {presetUsed && (
+                <p className="text-gold/80 text-xs mt-2">✓ Tejido del catálogo aplicado automáticamente</p>
+              )}
+            </div>
+          ) : (
+            <UploadZone
+              title="🎨 Sube una foto del tejido elegido"
+              hint="Puedes subir una muestra o una imagen del tejido que te guste"
+              icon={Palette}
+              onFile={handleFile(setFabric)}
+              inputId="upload-fabric"
+            />
           )}
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-wrap gap-3 justify-center text-cream/70 text-xs">
+          <span className="px-3 py-1 rounded-full bg-navy-deep/60 border border-gold/30">✅ Mueble cargado</span>
+          <span className="px-3 py-1 rounded-full bg-navy-deep/60 border border-gold/30">✅ Tejido cargado</span>
+        </div>
+      )}
 
-      {onlyOne && (
+      {(furniture && !fabric) || (!furniture && fabric) ? (
         <div className="rounded-xl bg-navy-deep/60 border border-gold/20 p-5 text-center text-cream/70 text-sm">
-          Sube también la foto del {!fabric ? "tejido" : "mueble"} para ver la visualización completa
+          Sube también la foto del {!fabric ? "tejido" : "mueble"} para ver la visualización
+        </div>
+      ) : null}
+
+      {both && processing && (
+        <div className="rounded-2xl bg-navy-deep/80 border-2 border-gold/40 p-10 flex flex-col items-center gap-3 text-cream">
+          <Loader2 className="animate-spin text-gold" size={32} />
+          <p className="text-sm">⏳ Generando visualización...</p>
         </div>
       )}
 
-      {both && (
-        <div className="rounded-2xl bg-navy-deep/80 border-2 border-gold p-5 md:p-7 animate-fade-in">
-          <h4 className="font-display text-xl text-gold mb-4">✨ Así quedará tu mueble</h4>
-          <div className="relative rounded-xl overflow-hidden shadow-lg max-h-[480px]">
-            <img src={furniture!} alt="Tu mueble" className="w-full block" />
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url(${fabric})`,
-                backgroundRepeat: "repeat",
-                backgroundSize: "200px",
-                mixBlendMode: "multiply",
-                opacity: 0.75,
-              }}
-            />
-          </div>
-          <p className="text-cream/60 text-xs mt-3">
-            🔍 Visualización orientativa. El resultado final puede variar según el tejido y el trabajo de tapizado.
-          </p>
+      {both && failed && !processing && (
+        <div className="rounded-xl bg-navy-deep/60 border border-gold/30 p-5 text-center text-cream/80 text-sm">
+          No ha sido posible generar la visualización. Puedes continuar con el presupuesto igualmente.
         </div>
       )}
 
-      {/* Vista final del proyecto */}
-      {both && composite && (
-        <div className="animate-fade-in mx-auto md:w-[85%] lg:w-[75%]">
+      {both && composite && !processing && (
+        <div className="animate-fade-in mx-auto md:w-[90%]">
           <div className="text-center mb-5">
             <h3 className="font-display text-2xl md:text-3xl text-gold">🛋️ Vista final de tu proyecto</h3>
             <p className="text-cream/60 text-sm mt-1">Así quedará tu mueble con el tejido seleccionado</p>
@@ -247,7 +289,7 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
 
           <div className="mt-5 flex flex-col sm:flex-row sm:justify-end gap-3">
             <Button variant="gold" onClick={downloadComposite}>
-              <Download size={18} className="mr-2" /> Descargar visualización
+              <Download size={18} className="mr-2" /> Descargar
             </Button>
             {onIncludeChange && (
               <Button
@@ -255,7 +297,7 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
                 onClick={() => onIncludeChange(!includeInPdf)}
               >
                 <FileText size={18} className="mr-2" />
-                {includeInPdf ? "✓ Incluida en el PDF" : "Incluir en el presupuesto PDF"}
+                {includeInPdf ? "✓ Incluida en el PDF" : "Incluir en PDF"}
               </Button>
             )}
             <Button variant="outline-gold" onClick={resetImages}>
@@ -263,7 +305,7 @@ export default function FabricVisualizer({ presetFabric, project, onCompositeCha
             </Button>
           </div>
           <p className="text-cream/50 text-xs mt-3 text-center sm:text-right">
-            Visualización orientativa generada a partir de las imágenes proporcionadas. El resultado final puede variar según el tejido y el trabajo de tapizado en taller.
+            Visualización orientativa. El resultado final puede variar según el tejido y el trabajo de tapizado en taller.
           </p>
         </div>
       )}
