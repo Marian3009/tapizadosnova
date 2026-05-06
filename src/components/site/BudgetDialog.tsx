@@ -27,6 +27,7 @@ type Props = {
     metraje: number;
     unidades: number;
     base: number;
+    composite?: string | null;
   };
 };
 
