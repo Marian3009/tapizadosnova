@@ -128,7 +128,33 @@ export default function AvisoLegal() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-navy-deep mt-8 mb-3">8. Legislación aplicable y jurisdicción</h2>
+            <h2 className="font-display text-2xl text-navy-deep mt-8 mb-3">
+              8. Protección de datos y cookies
+            </h2>
+            <p>
+              El tratamiento de los datos personales recabados a través del sitio web, así como
+              la información detallada sobre el uso de cookies, sus tipos, finalidad, duración y
+              cómo gestionarlas o retirar el consentimiento, se regula de forma específica en
+              nuestra{" "}
+              <Link to="/privacidad" className="text-primary underline">
+                Política de Privacidad
+              </Link>
+              , que forma parte integrante del presente Aviso Legal. En caso de discrepancia
+              entre ambos documentos en materia de datos personales o cookies, prevalecerá lo
+              establecido en la Política de Privacidad.
+            </p>
+            <p className="mt-3">
+              Para consultar las preguntas frecuentes sobre cookies y su gestión, puede acceder
+              directamente a la sección{" "}
+              <Link to="/privacidad#cookies-faq" className="text-primary underline">
+                Preguntas frecuentes sobre cookies
+              </Link>
+              .
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl text-navy-deep mt-8 mb-3">9. Legislación aplicable y jurisdicción</h2>
             <p>
               La relación entre Tapizados Nova y el usuario se regirá por la normativa española
               vigente. Para la resolución de cualquier controversia, las partes se someten a los
