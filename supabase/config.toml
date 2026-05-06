@@ -1,1 +1,4 @@
 project_id = "kmiaethuwbmivsoeqxpo"
+
+[functions.analyze-furniture]
+verify_jwt = false
