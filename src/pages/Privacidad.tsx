@@ -81,15 +81,17 @@ export default function Privacidad() {
         };
       })(),
     });
-    if (window.location.hash) {
-      const el = document.querySelector(window.location.hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
+    if (hash) {
+      // Defer to next frame so the DOM is ready (also handles in-app SPA nav)
+      requestAnimationFrame(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.scrollTo(0, 0);
+      });
+      return;
     }
     window.scrollTo(0, 0);
-  }, []);
+  }, [hash]);
 
   return (
     <div className="min-h-screen bg-background">
