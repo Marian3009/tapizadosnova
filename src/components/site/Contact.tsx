@@ -16,13 +16,6 @@ const schema = z.object({
   origen: z.string().optional(),
 });
 
-const contactInfo = [
-  { icon: Mail, label: "tapizadosnova@gmail.com", href: "mailto:tapizadosnova@gmail.com" },
-  { icon: Phone, label: "+34 611 491 661", href: "tel:+34611491661" },
-  { icon: MapPin, label: "Calle Bilbao N1, 1ª planta, 08191 Rubí (Barcelona)" },
-  { icon: Clock, label: "Lun-Vie: 9:00-18:00 · Sáb: 10:00-14:00" },
-];
-
 export default function Contact() {
   const [loading, setLoading] = useState(false);
 
