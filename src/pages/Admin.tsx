@@ -10,6 +10,8 @@ import { DEFAULT_SETTINGS, getSettings, saveSettings, type Settings } from "@/li
 import { DEFAULT_FAQS, type FaqItem } from "@/components/site/FAQ";
 import type { SavedBudget } from "@/components/site/BudgetDialog";
 import { generateBudgetPdf } from "@/lib/generateBudgetPdf";
+import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 type FabricCategory = "basico" | "antimanchas" | "terciopelo" | "premium";
 type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
