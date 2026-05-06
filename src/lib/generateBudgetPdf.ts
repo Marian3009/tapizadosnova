@@ -152,7 +152,89 @@ export function generateBudgetPdf(data: BudgetData): jsPDF {
   doc.setFontSize(8);
   doc.setTextColor(...NAVY);
   doc.setFont("helvetica", "italic");
-  doc.text("Tapizados Nova – Tapicería artesanal en Rubí, Barcelona desde 2003", W / 2, 290, { align: "center" });
+  // Second page: visualization
+  if (data.composite) {
+    try {
+      doc.addPage();
+      const PW = 210, PH = 297;
+      // Top gold line
+      doc.setDrawColor(...GOLD);
+      doc.setLineWidth(1.2);
+      doc.line(14, 14, PW - 14, 14);
+
+      doc.setTextColor(...GOLD);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("VISUALIZACIÓN DEL PROYECTO", PW / 2, 24, { align: "center" });
+      doc.setTextColor(...NAVY);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`Nº Presupuesto: ${data.numero}`, PW / 2, 31, { align: "center" });
+
+      // Image area
+      const props = doc.getImageProperties(data.composite);
+      const maxW = PW - 40;
+      const maxH = 130;
+      const ratio = props.width / props.height;
+      let iw = maxW, ih = maxW / ratio;
+      if (ih > maxH) { ih = maxH; iw = maxH * ratio; }
+      const ix = (PW - iw) / 2;
+      const iy = 40;
+      // Soft shadow
+      doc.setFillColor(220, 220, 220);
+      doc.roundedRect(ix + 1.5, iy + 1.5, iw, ih, 1.5, 1.5, "F");
+      doc.addImage(data.composite, "JPEG", ix, iy, iw, ih);
+      doc.setDrawColor(...GOLD);
+      doc.setLineWidth(0.8);
+      doc.rect(ix, iy, iw, ih);
+
+      // Datos
+      let y2 = iy + ih + 12;
+      doc.setDrawColor(...GOLD);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(20, y2, PW - 40, 36, 2, 2);
+      doc.setTextColor(...GOLD); doc.setFont("helvetica", "bold"); doc.setFontSize(11);
+      doc.text("DATOS DEL PROYECTO", 24, y2 + 7);
+      doc.setTextColor(...NAVY); doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+      doc.text(`Cliente: ${data.cliente.nombre}`, 24, y2 + 15);
+      doc.text(`Mueble: ${data.muebleLabel}`, 24, y2 + 22);
+      doc.text(`Tejido: ${data.telaLabel}${data.tejidoNombre ? " - " + data.tejidoNombre : ""}`, 24, y2 + 29);
+      doc.text(`Metraje estimado: ${data.metraje.toFixed(2).replace(".", ",")} metros`, PW - 24, y2 + 29, { align: "right" });
+
+      // Aviso
+      y2 += 44;
+      const avisoLines = [
+        "IMAGEN ORIENTATIVA",
+        "Esta visualización ha sido generada combinando la fotografía del mueble facilitada por el cliente con una muestra del tejido seleccionado. El resultado final del tapizado en taller puede diferir de esta simulación en cuanto a tonalidad, textura y acabado.",
+      ];
+      doc.setFontSize(9);
+      const wrapped: { text: string; bold: boolean }[] = [];
+      avisoLines.forEach((l, idx) => {
+        const lines = doc.splitTextToSize(l, PW - 50);
+        lines.forEach((ln: string) => wrapped.push({ text: ln, bold: idx === 0 }));
+      });
+      const ah = wrapped.length * 4.5 + 8;
+      doc.setDrawColor(...GOLD);
+      doc.setLineWidth(0.6);
+      doc.roundedRect(20, y2, PW - 40, ah, 2, 2);
+      let ay = y2 + 6;
+      wrapped.forEach((w) => {
+        doc.setFont("helvetica", w.bold ? "bold" : "normal");
+        doc.setTextColor(...(w.bold ? GOLD : NAVY));
+        doc.text(w.text, 24, ay);
+        ay += 4.5;
+      });
+
+      // Footer
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(...NAVY);
+      doc.text("Tapizados Nova – Tapicería artesanal en Rubí, Barcelona desde 2003", PW / 2, PH - 14, { align: "center" });
+      doc.text("tapizadosnova@gmail.com  |  +34 611 491 661", PW / 2, PH - 9, { align: "center" });
+    } catch {
+      /* ignore image errors */
+    }
+  }
 
   return doc;
 }
