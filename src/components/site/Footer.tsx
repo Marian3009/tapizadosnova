@@ -45,7 +45,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between gap-4 text-xs text-cream/50">
-          <div>© 2024 Tapizados Nova · <a href="#" className="hover:text-gold">Política de Privacidad</a> · <a href="#" className="hover:text-gold">Aviso Legal</a></div>
+          <div>© 2024 Tapizados Nova · <a href="/privacidad" className="hover:text-gold">Política de Privacidad</a> · <a href="/aviso-legal" className="hover:text-gold">Aviso Legal</a></div>
           <div>Tapicería artesanal en Rubí, Barcelona desde 2003</div>
         </div>
       </div>
