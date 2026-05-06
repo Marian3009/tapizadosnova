@@ -17,6 +17,8 @@ export default function Calculator() {
   const [fabrics, setFabrics] = useState<Fabric[]>([]);
   const [selectedFabricId, setSelectedFabricId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [composite, setComposite] = useState<string | null>(null);
+  const [includeInPdf, setIncludeInPdf] = useState(true);
 
   useEffect(() => {
     try {
