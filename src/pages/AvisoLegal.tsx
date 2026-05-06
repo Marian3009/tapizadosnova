@@ -11,15 +11,21 @@ export default function AvisoLegal() {
       description:
         "Aviso Legal de Tapizados Nova conforme a la LSSI-CE: datos identificativos del titular, condiciones de uso, propiedad intelectual y legislación aplicable.",
       path: "/aviso-legal",
-      jsonLd: buildPageGraph({
-        "@type": "WebPage",
-        "@id": `${SITE_URL}/aviso-legal#page`,
-        name: "Aviso Legal",
-        inLanguage: "es-ES",
-        url: `${SITE_URL}/aviso-legal`,
-        about: "Aviso legal y condiciones de uso del sitio web",
-        dateModified: "2026-05-01",
-      }),
+      jsonLd: buildPageGraph(
+        {
+          "@type": "WebPage",
+          "@id": `${SITE_URL}/aviso-legal#page`,
+          name: "Aviso Legal",
+          inLanguage: "es-ES",
+          url: `${SITE_URL}/aviso-legal`,
+          about: "Aviso legal y condiciones de uso del sitio web",
+          dateModified: "2026-05-01",
+        },
+        [
+          { name: "Inicio", path: "/" },
+          { name: "Aviso Legal", path: "/aviso-legal" },
+        ],
+      ),
     });
     window.scrollTo(0, 0);
   }, []);
