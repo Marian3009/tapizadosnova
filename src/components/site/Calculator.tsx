@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import SectionHeader from "./SectionHeader";
 import BudgetDialog from "./BudgetDialog";
 import { MUEBLES, TELAS, TELA_LABELS, getMueble, type FabricCategory } from "@/lib/catalog";
+import FabricVisualizer from "./FabricVisualizer";
 
 type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
 
@@ -142,10 +143,16 @@ export default function Calculator() {
             <p className="mt-5 text-cream/70 text-sm leading-relaxed">
               Precio orientativo sin IVA. Sujeto a revisión presencial.
             </p>
-            <Button variant="gold" size="lg" className="mt-6 w-full" onClick={() => setOpen(true)}>
-              Solicitar presupuesto detallado
-            </Button>
           </div>
+        </div>
+
+        {/* Visualizador de mueble + tejido */}
+        <FabricVisualizer presetFabric={selectedFabric ? { nombre: selectedFabric.nombre, imagen: selectedFabric.imagen } : null} />
+
+        <div className="reveal mt-8 flex justify-center">
+          <Button variant="gold" size="lg" onClick={() => setOpen(true)} className="px-10">
+            Solicitar presupuesto detallado
+          </Button>
         </div>
       </div>
 
