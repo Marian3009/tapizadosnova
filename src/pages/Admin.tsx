@@ -35,32 +35,115 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export default function Admin() {
-  const [authed, setAuthed] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem("tn_admin") === "1") setAuthed(true);
     document.title = "Admin · Tapizados Nova";
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      if (!s) {
+        setIsAdmin(false);
+        setChecking(false);
+      } else {
+        // Defer role check to avoid deadlock
+        setTimeout(async () => {
+          const { data, error } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", s.user.id)
+            .eq("role", "admin")
+            .maybeSingle();
+          setIsAdmin(!error && !!data);
+          setChecking(false);
+        }, 0);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      if (!s) setChecking(false);
+    });
+
+    return () => sub.subscription.unsubscribe();
   }, []);
 
-  const submitLogin = (e: React.FormEvent) => {
+  const submitLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pwd === "admin2024") {
-      sessionStorage.setItem("tn_admin", "1");
-      setAuthed(true);
-    } else toast.error("Contraseña incorrecta");
+    setBusy(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password: pwd,
+          options: { emailRedirectTo: `${window.location.origin}/admin` },
+        });
+        if (error) throw error;
+        toast.success("Cuenta creada. Pide a un admin que te asigne permisos.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+        if (error) throw error;
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Error de autenticación");
+    } finally {
+      setBusy(false);
+    }
   };
 
-  if (!authed) {
+  const logout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-navy flex items-center justify-center text-cream">
+        Cargando…
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="min-h-screen bg-navy flex items-center justify-center p-6">
         <form onSubmit={submitLogin} className="w-full max-w-sm bg-cream rounded-xl p-8 shadow-xl">
           <h1 className="font-display text-2xl text-navy mb-1">Panel de administración</h1>
           <p className="text-sm text-muted-foreground mb-6">Tapizados Nova</p>
+          <Label>Email</Label>
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 mb-3" required autoFocus />
           <Label>Contraseña</Label>
-          <Input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} className="mt-1" autoFocus />
-          <Button type="submit" variant="gold" className="w-full mt-5">Entrar</Button>
+          <Input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} className="mt-1" required minLength={8} />
+          <Button type="submit" variant="gold" className="w-full mt-5" disabled={busy}>
+            {busy ? "..." : mode === "signin" ? "Entrar" : "Crear cuenta"}
+          </Button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className="text-xs text-muted-foreground mt-3 w-full text-center hover:underline"
+          >
+            {mode === "signin" ? "¿No tienes cuenta? Crear cuenta" : "¿Ya tienes cuenta? Entrar"}
+          </button>
         </form>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-navy flex items-center justify-center p-6">
+        <div className="w-full max-w-sm bg-cream rounded-xl p-8 shadow-xl text-center">
+          <h1 className="font-display text-2xl text-navy mb-2">Acceso denegado</h1>
+          <p className="text-sm text-muted-foreground mb-5">
+            Tu cuenta ({session.user.email}) no tiene permisos de administrador.
+          </p>
+          <Button variant="outline" onClick={logout}>Cerrar sesión</Button>
+        </div>
       </div>
     );
   }
@@ -69,7 +152,7 @@ export default function Admin() {
     <div className="min-h-screen bg-cream">
       <header className="bg-navy text-cream py-5 px-6 flex items-center justify-between">
         <h1 className="font-display text-xl text-gold">Tapizados Nova · Admin</h1>
-        <Button variant="outline-cream" size="sm" onClick={() => { sessionStorage.removeItem("tn_admin"); setAuthed(false); }}>
+        <Button variant="outline-cream" size="sm" onClick={logout}>
           Cerrar sesión
         </Button>
       </header>
