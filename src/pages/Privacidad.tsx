@@ -45,8 +45,8 @@ export default function Privacidad() {
       description:
         "Política de Privacidad de Tapizados Nova conforme al RGPD y la LOPDGDD: responsable, finalidad, legitimación, conservación y derechos del usuario.",
       path: "/privacidad",
-      jsonLd: {
-        ...buildPageGraph(
+      jsonLd: (() => {
+        const base = buildPageGraph(
           {
             "@type": "PrivacyPolicy",
             "@id": `${SITE_URL}/privacidad#page`,
@@ -60,35 +60,25 @@ export default function Privacidad() {
             { name: "Inicio", path: "/" },
             { name: "Política de Privacidad", path: "/privacidad" },
           ],
-        ),
-        "@graph": [
-          ...buildPageGraph(
+        );
+        return {
+          ...base,
+          "@graph": [
+            ...base["@graph"],
             {
-              "@type": "PrivacyPolicy",
-              "@id": `${SITE_URL}/privacidad#page`,
-              name: "Política de Privacidad",
+              "@type": "FAQPage",
+              "@id": `${SITE_URL}/privacidad#cookies-faq`,
+              name: "Preguntas frecuentes sobre cookies",
               inLanguage: "es-ES",
-              url: `${SITE_URL}/privacidad`,
-              dateModified: "2026-05-01",
+              mainEntity: cookieFaqs.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
             },
-            [
-              { name: "Inicio", path: "/" },
-              { name: "Política de Privacidad", path: "/privacidad" },
-            ],
-          )["@graph"],
-          {
-            "@type": "FAQPage",
-            "@id": `${SITE_URL}/privacidad#cookies-faq`,
-            name: "Preguntas frecuentes sobre cookies",
-            inLanguage: "es-ES",
-            mainEntity: cookieFaqs.map((f) => ({
-              "@type": "Question",
-              name: f.q,
-              acceptedAnswer: { "@type": "Answer", text: f.a },
-            })),
-          },
-        ],
-      },
+          ],
+        };
+      })(),
     });
     window.scrollTo(0, 0);
   }, []);
