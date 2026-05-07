@@ -115,11 +115,13 @@ export default function FabricVisualizer({
   useEffect(() => {
     if (!processing) return;
     setStepIdx(0);
-    const t1 = setTimeout(() => setStepIdx(1), 2500);
-    const t2 = setTimeout(() => setStepIdx(2), 6000);
+    const t1 = setTimeout(() => setStepIdx(1), 3000);
+    const t2 = setTimeout(() => setStepIdx(2), 8000);
+    const t3 = setTimeout(() => setStepIdx(3), 15000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [processing]);
 
