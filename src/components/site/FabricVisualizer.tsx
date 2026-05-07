@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -19,9 +20,10 @@ interface Props {
 }
 
 const PROCESSING_STEPS = [
-  "🔍 Analizando el mueble con IA...",
-  "🎨 Aplicando el tejido al mueble...",
-  "✨ Finalizando la visualización...",
+  { label: "🔍 Analizando el mueble con IA...", pct: 25 },
+  { label: "🧵 Estudiando el tejido y su textura...", pct: 50 },
+  { label: "🎨 Aplicando el tejido al mueble...", pct: 75 },
+  { label: "✨ Finalizando la visualización...", pct: 92 },
 ];
 
 async function fileToDataUrl(file: File): Promise<string> {
@@ -113,11 +115,13 @@ export default function FabricVisualizer({
   useEffect(() => {
     if (!processing) return;
     setStepIdx(0);
-    const t1 = setTimeout(() => setStepIdx(1), 2500);
-    const t2 = setTimeout(() => setStepIdx(2), 6000);
+    const t1 = setTimeout(() => setStepIdx(1), 3000);
+    const t2 = setTimeout(() => setStepIdx(2), 8000);
+    const t3 = setTimeout(() => setStepIdx(3), 15000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [processing]);
 
@@ -233,11 +237,28 @@ export default function FabricVisualizer({
 
   // ESTADO 2: procesando
   if (processing) {
+    const step = PROCESSING_STEPS[stepIdx];
     return (
-      <div className="reveal mt-12 rounded-2xl border border-gold/30 bg-navy-deep/60 p-12 text-center animate-fade-in">
-        <div className="inline-block w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin mb-5" />
-        <p className="text-cream text-lg">{PROCESSING_STEPS[stepIdx]}</p>
-        <p className="text-cream/50 text-sm mt-2">La IA puede tardar entre 10 y 30 segundos</p>
+      <div className="reveal mt-12 rounded-2xl border border-gold/30 bg-navy-deep/60 p-10 md:p-12 text-center animate-fade-in max-w-2xl mx-auto">
+        <div className="inline-block w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin mb-6" />
+        <p className="text-cream text-lg md:text-xl font-medium mb-2">{step.label}</p>
+        <p className="text-cream/50 text-sm mb-6">Paso {stepIdx + 1} de {PROCESSING_STEPS.length} · La IA puede tardar entre 10 y 30 segundos</p>
+        <Progress value={step.pct} className="h-2 bg-cream/10 [&>div]:bg-gold" />
+        <ul className="mt-6 space-y-2 text-left max-w-sm mx-auto">
+          {PROCESSING_STEPS.map((s, i) => (
+            <li
+              key={i}
+              className={`flex items-center gap-2 text-sm transition-opacity ${
+                i < stepIdx ? "text-cream/60" : i === stepIdx ? "text-cream" : "text-cream/30"
+              }`}
+            >
+              <span className="inline-flex w-5 h-5 items-center justify-center rounded-full border border-gold/40 text-[10px]">
+                {i < stepIdx ? "✓" : i + 1}
+              </span>
+              <span>{s.label.replace(/^[^\s]+\s/, "")}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
