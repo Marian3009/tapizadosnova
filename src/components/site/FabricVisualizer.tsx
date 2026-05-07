@@ -123,16 +123,25 @@ export default function FabricVisualizer({
 
   const handleFile = async (file: File, kind: "furniture" | "fabric") => {
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      toast({ title: "Imagen demasiado grande", description: "Máximo 8 MB", variant: "destructive" });
+    if (file.size > 20 * 1024 * 1024) {
+      toast({ title: "Imagen demasiado grande", description: "Máximo 20 MB", variant: "destructive" });
       return;
     }
-    const url = await fileToDataUrl(file);
-    if (kind === "furniture") {
-      setFurniture(url);
-      setFurnitureMime(file.type || "image/jpeg");
-    } else {
-      setFabric(url);
+    try {
+      const { dataUrl, mime } = await resizeImageToJpegDataUrl(file);
+      if (kind === "furniture") {
+        setFurniture(dataUrl);
+        setFurnitureMime(mime);
+      } else {
+        setFabric(dataUrl);
+      }
+    } catch (e) {
+      console.error("resize error", e);
+      toast({
+        title: "No se ha podido leer la imagen",
+        description: "Prueba con otra foto (JPG o PNG).",
+        variant: "destructive",
+      });
     }
   };
 
