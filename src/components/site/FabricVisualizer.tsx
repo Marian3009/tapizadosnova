@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -19,9 +20,10 @@ interface Props {
 }
 
 const PROCESSING_STEPS = [
-  "🔍 Analizando el mueble con IA...",
-  "🎨 Aplicando el tejido al mueble...",
-  "✨ Finalizando la visualización...",
+  { label: "🔍 Analizando el mueble con IA...", pct: 25 },
+  { label: "🧵 Estudiando el tejido y su textura...", pct: 50 },
+  { label: "🎨 Aplicando el tejido al mueble...", pct: 75 },
+  { label: "✨ Finalizando la visualización...", pct: 92 },
 ];
 
 async function fileToDataUrl(file: File): Promise<string> {
