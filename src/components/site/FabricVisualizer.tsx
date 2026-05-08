@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import FabricCatalogPicker from "./FabricCatalogPicker";
 
 type Project = {
   muebleLabel: string;
