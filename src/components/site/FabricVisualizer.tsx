@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import FabricCatalogPicker from "./FabricCatalogPicker";
 
 type Project = {
   muebleLabel: string;
@@ -103,6 +104,8 @@ export default function FabricVisualizer({
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [fabricLabel, setFabricLabel] = useState<string | null>(null);
 
   useEffect(() => {
     if (presetFabric?.imagen) setFabric(presetFabric.imagen);
@@ -274,11 +277,19 @@ export default function FabricVisualizer({
         onClear={() => setFurniture(null)}
       />
       <UploadZone
-        title="🧵 Sube la foto del tejido"
-        hint={presetFabric ? `Precargado: ${presetFabric.nombre}` : "O elige uno del catálogo"}
+        title="🧵 Foto del tejido"
+        hint={presetFabric ? `Precargado: ${presetFabric.nombre}` : "Sube una foto o elige del catálogo"}
         value={fabric}
-        onFile={(f) => handleFile(f, "fabric")}
-        onClear={() => setFabric(null)}
+        valueLabel={fabricLabel ?? presetFabric?.nombre ?? null}
+        onFile={(f) => { setFabricLabel(null); handleFile(f, "fabric"); }}
+        onClear={() => { setFabric(null); setFabricLabel(null); }}
+        onPickCatalog={() => setPickerOpen(true)}
+      />
+
+      <FabricCatalogPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={(f) => { setFabric(f.imagen); setFabricLabel(f.nombre); }}
       />
 
       {error && (
@@ -305,14 +316,18 @@ function UploadZone({
   title,
   hint,
   value,
+  valueLabel,
   onFile,
   onClear,
+  onPickCatalog,
 }: {
   title: string;
   hint: string;
   value: string | null;
+  valueLabel?: string | null;
   onFile: (f: File) => void;
   onClear: () => void;
+  onPickCatalog?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
@@ -329,16 +344,34 @@ function UploadZone({
           >
             ×
           </button>
+          {valueLabel && (
+            <div className="absolute bottom-2 left-2 right-2 bg-navy/80 text-cream text-xs px-2 py-1 rounded truncate">
+              {valueLabel}
+            </div>
+          )}
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="w-full h-48 rounded-lg bg-cream/5 border border-gold/20 hover:bg-cream/10 transition flex flex-col items-center justify-center text-cream/70"
-        >
-          <span className="text-3xl mb-2">＋</span>
-          <span className="text-sm">{hint}</span>
-        </button>
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="w-full h-36 rounded-lg bg-cream/5 border border-gold/20 hover:bg-cream/10 transition flex flex-col items-center justify-center text-cream/70"
+          >
+            <span className="text-3xl mb-1">＋</span>
+            <span className="text-sm">{hint}</span>
+          </button>
+          {onPickCatalog && (
+            <Button
+              type="button"
+              variant="outline-gold"
+              size="sm"
+              className="w-full"
+              onClick={onPickCatalog}
+            >
+              📚 Elegir del catálogo Güell Lamadrid
+            </Button>
+          )}
+        </div>
       )}
       <input
         ref={inputRef}
