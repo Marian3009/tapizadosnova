@@ -104,6 +104,8 @@ export default function FabricVisualizer({
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [fabricLabel, setFabricLabel] = useState<string | null>(null);
 
   useEffect(() => {
     if (presetFabric?.imagen) setFabric(presetFabric.imagen);
