@@ -48,9 +48,10 @@ export default function Navbar() {
         </nav>
 
         <button
-          className="lg:hidden text-cream"
+          className="lg:hidden text-cream inline-flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 rounded-md hover:bg-cream/10 transition-colors"
           onClick={() => setOpen(!open)}
-          aria-label="Menú"
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={open}
         >
           {open ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -64,7 +65,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-cream/90 hover:text-gold py-2 uppercase tracking-widest text-sm"
+                className="text-cream/90 hover:text-gold py-3 min-h-[44px] flex items-center uppercase tracking-widest text-sm"
               >
                 {l.label}
               </a>

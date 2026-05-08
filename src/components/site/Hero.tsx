@@ -9,6 +9,8 @@ export default function Hero() {
         alt="Sofá tapizado elegante de Tapizados Nova en Rubí, Barcelona"
         width={1920}
         height={1280}
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover animate-scale-in"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/95 via-navy/80 to-navy/40" />

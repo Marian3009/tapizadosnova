@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import SectionHeader from "./SectionHeader";
 import BudgetDialog from "./BudgetDialog";
 import { MUEBLES, TELAS, TELA_LABELS, getMueble, type FabricCategory } from "@/lib/catalog";
@@ -75,14 +77,46 @@ export default function Calculator() {
                 </SelectContent>
               </Select>
               <div className="mt-3 rounded-md bg-gold/10 border border-gold/20 px-4 py-3">
-                <p className="text-gold font-medium text-sm">📐 Metraje estimado de tejido: {mueble.metraje.toFixed(2).replace(".", ",")} metros</p>
+                <p className="text-gold font-medium text-sm flex items-center gap-2">
+                  <span>📐 Metraje estimado de tejido: {mueble.metraje.toFixed(2).replace(".", ",")} metros</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Más información sobre el metraje"
+                        className="inline-flex items-center justify-center w-6 h-6 rounded-full text-gold/80 hover:text-gold hover:bg-gold/10 transition-colors"
+                      >
+                        <Info size={14} />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs text-xs leading-relaxed">
+                      El metraje es una estimación basada en modelos estándar. El cálculo final puede variar según el diseño específico y el patrón de la tela elegida.
+                    </TooltipContent>
+                  </Tooltip>
+                </p>
                 <p className="text-cream/50 text-xs mt-1">Orientativo. Puede variar según diseño y patrón del tejido.</p>
               </div>
             </div>
 
             {/* 2. Tipo de tela */}
             <div>
-              <Label className="text-cream mb-3 block uppercase text-xs tracking-widest">2 · Tipo de tela</Label>
+              <Label className="text-cream mb-3 flex items-center gap-2 uppercase text-xs tracking-widest">
+                <span>2 · Tipo de tela</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Más información sobre el tipo de tela"
+                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-cream/60 hover:text-gold hover:bg-cream/10 transition-colors"
+                    >
+                      <Info size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs text-xs leading-relaxed normal-case tracking-normal">
+                    Los precios varían según la composición y resistencia del tejido (algodón, antimanchas, terciopelo, bouclé...). Te asesoramos para acertar con tu uso.
+                  </TooltipContent>
+                </Tooltip>
+              </Label>
               <Select value={telaKey} onValueChange={(v) => setTelaKey(v as FabricCategory)}>
                 <SelectTrigger className="h-12 bg-navy/50 border-cream/20 text-cream">
                   <SelectValue />
