@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import SectionHeader from "./SectionHeader";
 import BudgetDialog from "./BudgetDialog";
 import { MUEBLES, TELAS, TELA_LABELS, getMueble, type FabricCategory } from "@/lib/catalog";
+import { CATALOG_FABRICS } from "@/lib/fabricsData";
 import FabricVisualizer from "./FabricVisualizer";
 
 type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
@@ -16,7 +17,7 @@ export default function Calculator() {
   const [muebleKey, setMuebleKey] = useState<string>("t_sofa3");
   const [telaKey, setTelaKey] = useState<FabricCategory>("antimanchas");
   const [qty, setQty] = useState(1);
-  const [fabrics, setFabrics] = useState<Fabric[]>([]);
+  const [fabrics, setFabrics] = useState<Fabric[]>(CATALOG_FABRICS);
   const [selectedFabricId, setSelectedFabricId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [composite, setComposite] = useState<string | null>(null);
@@ -25,7 +26,10 @@ export default function Calculator() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem("tn_fabrics");
-      if (raw) setFabrics(JSON.parse(raw));
+      if (raw) {
+        const custom = JSON.parse(raw);
+        if (Array.isArray(custom) && custom.length > 0) setFabrics([...CATALOG_FABRICS, ...custom]);
+      }
     } catch { /* */ }
   }, []);
 
