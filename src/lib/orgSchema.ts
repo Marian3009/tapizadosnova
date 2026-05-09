@@ -1,6 +1,6 @@
 // Shared organization / LocalBusiness data for JSON-LD reuse across pages.
 
-export const SITE_URL = "https://tapizadosnova.com";
+export const SITE_URL = "https://tapizadosnova.es";
 export const ORG_ID = `${SITE_URL}/#organization`;
 
 export const organizationJsonLd = {
@@ -80,4 +80,3 @@ export function buildPageGraph(
   graph.push({ ...pageNode, publisher: { "@id": ORG_ID }, isPartOf: { "@id": ORG_ID } });
   return { "@context": "https://schema.org", "@graph": graph };
 }
-
