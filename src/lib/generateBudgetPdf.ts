@@ -1,11 +1,20 @@
 import jsPDF from "jspdf";
 
+export type CatalogoInfo = {
+  coleccion: string;
+  referencia: string;
+  color: string;
+  hex?: string;
+  tipo?: string;
+};
+
 export type BudgetData = {
   cliente: { nombre: string; email: string; telefono?: string; direccion?: string };
   modalidad: "tapizado" | "funda";
   muebleLabel: string;
   telaLabel: string;
   tejidoNombre?: string;
+  catalogo?: CatalogoInfo;
   metraje: number;
   unidades: number;
   base: number;
