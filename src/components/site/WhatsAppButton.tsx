@@ -1,19 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import { getSettings } from "@/lib/settings";
 
+function normalizeWhatsapp(url: string) {
+  if (!url) return "https://wa.me/34611491661";
+  // Convertir api.whatsapp.com/send?phone=XXXX a wa.me/XXXX para evitar bloqueos de framing
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("api.whatsapp.com")) {
+      const phone = u.searchParams.get("phone") || "";
+      const text = u.searchParams.get("text");
+      const base = `https://wa.me/${phone.replace(/\D/g, "")}`;
+      return text ? `${base}?text=${encodeURIComponent(text)}` : base;
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 export default function WhatsAppButton() {
-  const [href, setHref] = useState(getSettings().whatsapp);
+  const [href, setHref] = useState(normalizeWhatsapp(getSettings().whatsapp));
   useEffect(() => {
-    const update = () => setHref(getSettings().whatsapp);
+    const update = () => setHref(normalizeWhatsapp(getSettings().whatsapp));
     window.addEventListener("tn_settings_changed", update);
     return () => window.removeEventListener("tn_settings_changed", update);
   }, []);
+
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    // Forzar apertura en pestaña externa real (evita ERR_BLOCKED_BY_RESPONSE dentro del iframe del preview)
+    e.preventDefault();
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       aria-label="Chatea con nosotros por WhatsApp"
       className="group fixed bottom-5 right-5 z-50"
     >
