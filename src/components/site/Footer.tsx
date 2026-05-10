@@ -19,7 +19,7 @@ export default function Footer() {
               Tapizados <span className="italic font-normal">Nova</span>
             </div>
             <p className="text-cream/70 leading-relaxed">
-              Decoración Textil. Tapicería artesanal de calidad premium en Rubí, Barcelona desde 2003.
+              Decoración Textil. Tapicería artesanal de calidad premium con más de 30 años de experiencia desde 1995.
             </p>
           </div>
           <div>
@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between gap-4 text-xs text-cream/50">
           <div>© 2024 Tapizados Nova · <a href="/privacidad" className="hover:text-gold">Política de Privacidad</a> · <a href="/aviso-legal" className="hover:text-gold">Aviso Legal</a></div>
-          <div>Tapicería artesanal en Rubí, Barcelona desde 2003</div>
+          <div>Tapicería artesanal desde 1995 · Más de 30 años de experiencia</div>
         </div>
       </div>
     </footer>
