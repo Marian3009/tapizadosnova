@@ -12,6 +12,7 @@ import type { SavedBudget } from "@/components/site/BudgetDialog";
 import { generateBudgetPdf } from "@/lib/generateBudgetPdf";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import BlogAdmin from "@/components/site/BlogAdmin";
 
 type FabricCategory = "basico" | "antimanchas" | "terciopelo" | "premium";
 type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
@@ -161,6 +162,7 @@ export default function Admin() {
         <Tabs defaultValue="presupuestos">
           <TabsList className="mb-6 flex flex-wrap h-auto">
             <TabsTrigger value="presupuestos">Presupuestos</TabsTrigger>
+            <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="catalogo">Tejidos</TabsTrigger>
             <TabsTrigger value="galeria">Galería</TabsTrigger>
             <TabsTrigger value="testimonios">Testimonios</TabsTrigger>
@@ -169,6 +171,7 @@ export default function Admin() {
           </TabsList>
 
           <TabsContent value="presupuestos"><BudgetsAdmin /></TabsContent>
+          <TabsContent value="blog"><BlogAdmin /></TabsContent>
           <TabsContent value="catalogo"><FabricsAdmin /></TabsContent>
           <TabsContent value="galeria"><GalleryAdmin /></TabsContent>
           <TabsContent value="testimonios"><TestimoniosAdmin /></TabsContent>

@@ -1,41 +1,37 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import SectionHeader from "./SectionHeader";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowRight } from "lucide-react";
-import g1 from "@/assets/gallery-1.jpg";
-import g2 from "@/assets/gallery-2.jpg";
-import g3 from "@/assets/gallery-3.jpg";
+import { Calendar, ArrowRight, Tag } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "Tendencias en Tapicería 2026",
-    excerpt:
-      "Descubre cómo los tejidos naturales y las telas inteligentes están transformando los hogares este año.",
-    date: "8 de Mayo, 2026",
-    image: g1,
-    slug: "tendencias-tapiceria-2026",
-  },
-  {
-    id: 2,
-    title: "Cómo elegir la tela perfecta para tu sofá",
-    excerpt:
-      "Resistencia, textura y color: claves para acertar con el tejido que vestirá tu salón durante años.",
-    date: "22 de Abril, 2026",
-    image: g2,
-    slug: "elegir-tela-sofa",
-  },
-  {
-    id: 3,
-    title: "Restaurar o tapizar de nuevo: ¿qué te conviene?",
-    excerpt:
-      "Te explicamos cuándo merece la pena restaurar un mueble antiguo y cuándo conviene un tapizado completo.",
-    date: "5 de Abril, 2026",
-    image: g3,
-    slug: "restaurar-o-tapizar",
-  },
-];
+interface PostRow {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  category: string;
+  featured_image_url: string | null;
+  featured_image_alt: string | null;
+  published_at: string | null;
+  created_at: string;
+}
 
 export default function Blog() {
+  const [posts, setPosts] = useState<PostRow[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("blog_posts")
+      .select("id,title,slug,excerpt,category,featured_image_url,featured_image_alt,published_at,created_at")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(3)
+      .then(({ data }) => setPosts((data as PostRow[]) ?? []));
+  }, []);
+
+  if (posts.length === 0) return null;
+
   return (
     <section id="blog" className="section-padding bg-background">
       <div className="container-narrow">
@@ -46,35 +42,46 @@ export default function Blog() {
         />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-          {BLOG_POSTS.map((post, i) => (
+          {posts.map((post, i) => (
             <article
               key={post.id}
               className="reveal group flex flex-col rounded-xl overflow-hidden bg-cream shadow-[var(--shadow-card)] hover:shadow-xl transition-shadow duration-500"
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
+              <Link to={`/blog/${post.slug}`} className="block">
+                <div className="relative aspect-[4/3] overflow-hidden bg-navy/10">
+                  {post.featured_image_url ? (
+                    <img
+                      src={post.featured_image_url}
+                      alt={post.featured_image_alt || post.title}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-gold font-display text-2xl">
+                      Tapizados Nova
+                    </div>
+                  )}
+                </div>
+              </Link>
               <div className="flex flex-col flex-1 p-6">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gold mb-3">
-                  <Calendar size={14} />
-                  <span>{post.date}</span>
+                <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-gold mb-3">
+                  <span className="inline-flex items-center gap-1"><Tag size={14} />{post.category}</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar size={14} />
+                    {new Date(post.published_at ?? post.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                  </span>
                 </div>
                 <h3 className="font-display text-2xl text-navy leading-snug mb-3">
-                  {post.title}
+                  <Link to={`/blog/${post.slug}`} className="hover:text-gold transition-colors">{post.title}</Link>
                 </h3>
-                <p className="text-muted-foreground text-sm flex-1">{post.excerpt}</p>
-                <a
-                  href={`#blog`}
+                {post.excerpt && <p className="text-muted-foreground text-sm flex-1">{post.excerpt}</p>}
+                <Link
+                  to={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-2 mt-5 text-navy font-semibold hover:text-gold transition-colors"
                 >
                   Leer más <ArrowRight size={16} />
-                </a>
+                </Link>
               </div>
             </article>
           ))}
@@ -82,7 +89,7 @@ export default function Blog() {
 
         <div className="reveal text-center mt-14">
           <Button asChild variant="gold" size="lg">
-            <a href="#contacto">Ver todos los artículos</a>
+            <Link to="/blog">Ver todos los artículos</Link>
           </Button>
         </div>
       </div>
