@@ -36,7 +36,7 @@ const Index = () => {
   useEffect(() => {
     const title = "Tapizados Nova | Tapicería Artesanal en Barcelona";
     const description =
-      "Especialistas en tapizado de sofás, sillas y cabeceros con más de 20 años de experiencia. Calidad artesanal y presupuestos sin compromiso en Rubí, Barcelona.";
+      "Especialistas en tapizado de sofás, sillas y cabeceros con más de 30 años de experiencia desde 1995. Calidad artesanal y presupuestos sin compromiso.";
 
     const webSite = {
       "@type": "WebSite",

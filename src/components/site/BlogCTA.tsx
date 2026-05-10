@@ -20,7 +20,7 @@ const COPY = {
   },
   renueva: {
     title: "Renueva tu sofá con Tapizados Nova",
-    text: "Tapicería artesanal en Rubí (Barcelona). Más de 20 años de experiencia.",
+    text: "Tapicería artesanal con más de 30 años de experiencia desde 1995.",
     label: "Empezar mi proyecto",
     to: "/#contacto",
   },

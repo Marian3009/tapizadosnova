@@ -257,7 +257,7 @@ export function generateBudgetPdf(data: BudgetData): jsPDF {
       doc.setFontSize(8);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(...NAVY);
-      doc.text("Tapizados Nova – Tapicería artesanal en Rubí, Barcelona desde 2003", PW / 2, PH - 14, { align: "center" });
+      doc.text("Tapizados Nova – Tapicería artesanal desde 1995 · Más de 30 años de experiencia", PW / 2, PH - 14, { align: "center" });
       doc.text("tapizadosnova@gmail.com  |  +34 611 491 661", PW / 2, PH - 9, { align: "center" });
     } catch {
       /* ignore image errors */
