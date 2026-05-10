@@ -44,6 +44,17 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+        <div className="pt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => window.open(s.instagram, "_blank", "noopener,noreferrer")}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white text-sm font-medium shadow-lg hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-navy-deep"
+            aria-label="Ver perfil de Tapizados Nova en Instagram (se abre en nueva pestaña)"
+          >
+            <Instagram size={18} />
+            Ver en Instagram
+          </button>
+        </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between gap-4 text-xs text-cream/50">
           <div>© 2024 Tapizados Nova · <a href="/privacidad" className="hover:text-gold">Política de Privacidad</a> · <a href="/aviso-legal" className="hover:text-gold">Aviso Legal</a></div>
           <div>Tapicería artesanal · Más de 30 años de experiencia</div>
