@@ -91,7 +91,7 @@ export default function BlogPost() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <BlogHeader />
+        <BlogHeader compact />
         <div className="container-narrow py-20 text-center text-muted-foreground">Cargando artículo…</div>
       </div>
     );
@@ -99,7 +99,7 @@ export default function BlogPost() {
   if (notFound || !post) {
     return (
       <div className="min-h-screen bg-background">
-        <BlogHeader />
+        <BlogHeader compact />
         <div className="container-narrow py-20 text-center">
           <h1 className="font-display text-3xl text-navy mb-4">Artículo no encontrado</h1>
           <Link to="/blog" className="text-gold hover:underline">← Volver al blog</Link>
@@ -112,7 +112,7 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <BlogHeader />
+      <BlogHeader compact />
       <main className="flex-1">
         <article className="section-padding">
           <div className="container-narrow max-w-3xl">
