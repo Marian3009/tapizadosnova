@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 export default function BlogHeader() {
   return (
     <header className="bg-cream border-b border-gold/30">
-      <div className="container-narrow py-6 md:py-8 flex flex-col md:flex-row items-center md:justify-between gap-4">
+      <div className="container-narrow py-8 md:py-12 flex flex-col md:flex-row items-center md:justify-between gap-6">
         <Link to="/" className="flex items-center gap-3" aria-label="Tapizados Nova - Inicio">
           <img
             src={logo}
             alt="Tapizados Nova - Tapicería y decoración textil"
-            className="h-16 md:h-24 w-auto object-contain"
+            className="h-28 md:h-40 lg:h-48 w-auto object-contain drop-shadow-md"
             loading="eager"
           />
         </Link>
