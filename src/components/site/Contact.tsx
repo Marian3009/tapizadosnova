@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import SectionHeader from "./SectionHeader";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Nombre demasiado corto").max(100),
@@ -19,21 +20,61 @@ const schema = z.object({
 export default function Contact() {
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const data = Object.fromEntries(fd.entries());
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries()) as Record<string, string>;
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      toast.success("¡Mensaje enviado! Te contactaremos en menos de 24h.");
-      (e.target as HTMLFormElement).reset();
+    const v = parsed.data;
+    const submissionId = crypto.randomUUID();
+    const templateData = {
+      name: v.nombre,
+      email: v.email,
+      telefono: v.telefono || "",
+      tipo: v.tipo,
+      descripcion: v.descripcion,
+      origen: v.origen || "",
+    };
+
+    try {
+      const [clientRes, notifyRes] = await Promise.all([
+        supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "contact-confirmation",
+            recipientEmail: v.email,
+            idempotencyKey: `contact-confirm-${submissionId}`,
+            templateData: { name: v.nombre },
+          },
+        }),
+        supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "contact-notification",
+            recipientEmail: "tapizadosnova@gmail.com",
+            idempotencyKey: `contact-notify-${submissionId}`,
+            templateData,
+          },
+        }),
+      ]);
+
+      if (clientRes.error || notifyRes.error) {
+        console.error("Email error", clientRes.error, notifyRes.error);
+        toast.error("No pudimos enviar el mensaje. Inténtalo de nuevo o escríbenos por WhatsApp.");
+      } else {
+        toast.success("¡Mensaje enviado! Te contactaremos en menos de 24h.");
+        form.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error de conexión. Inténtalo de nuevo.");
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
 
   return (
