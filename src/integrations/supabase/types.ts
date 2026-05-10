@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_ideas: {
+        Row: {
+          category: string
+          created_at: string
+          generated_post_id: string | null
+          id: string
+          notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          generated_post_id?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          generated_post_id?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          week_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_ideas_generated_post_id_fkey"
+            columns: ["generated_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          category: string
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          featured_image_alt: string | null
+          featured_image_url: string | null
+          id: string
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image_alt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image_alt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
