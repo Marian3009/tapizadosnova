@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { generateBudgetPdf, buildBudgetNumber, type BudgetData } from "@/lib/generateBudgetPdf";
+import { generateBudgetPdf, buildBudgetNumber, type BudgetData, type CatalogoInfo } from "@/lib/generateBudgetPdf";
 import { getSettings } from "@/lib/settings";
 
 const schema = z.object({
@@ -24,6 +24,7 @@ type Props = {
     modalidad: "tapizado" | "funda";
     telaLabel: string;
     tejidoNombre?: string;
+    catalogo?: CatalogoInfo;
     metraje: number;
     unidades: number;
     base: number;
@@ -79,6 +80,7 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
       muebleLabel: context.muebleLabel,
       telaLabel: context.telaLabel,
       tejidoNombre: context.tejidoNombre,
+      catalogo: context.catalogo,
       metraje: context.metraje,
       unidades: context.unidades,
       base: +context.base.toFixed(2),

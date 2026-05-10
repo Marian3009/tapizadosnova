@@ -1,11 +1,20 @@
 import jsPDF from "jspdf";
 
+export type CatalogoInfo = {
+  coleccion: string;
+  referencia: string;
+  color: string;
+  hex?: string;
+  tipo?: string;
+};
+
 export type BudgetData = {
   cliente: { nombre: string; email: string; telefono?: string; direccion?: string };
   modalidad: "tapizado" | "funda";
   muebleLabel: string;
   telaLabel: string;
   tejidoNombre?: string;
+  catalogo?: CatalogoInfo;
   metraje: number;
   unidades: number;
   base: number;
@@ -82,7 +91,26 @@ export function generateBudgetPdf(data: BudgetData): jsPDF {
   doc.text(`Modalidad: ${data.modalidad === "tapizado" ? "Tapizado" : "Funda ajustable"}`, 14, y); y += 5;
   doc.text(`Tipo de mueble: ${data.muebleLabel}`, 14, y); y += 5;
   doc.text(`Tipo de tela: ${data.telaLabel}`, 14, y); y += 5;
-  if (data.tejidoNombre) { doc.text(`Tejido seleccionado: ${data.tejidoNombre}`, 14, y); y += 5; }
+  if (data.catalogo) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Tejido seleccionado del catálogo:", 14, y); y += 5;
+    doc.setFont("helvetica", "normal");
+    doc.text(`  · Colección: ${data.catalogo.coleccion}`, 14, y); y += 5;
+    doc.text(`  · Referencia: ${data.catalogo.referencia}`, 14, y); y += 5;
+    doc.text(`  · Color: ${data.catalogo.color}`, 14, y); y += 5;
+    if (data.catalogo.hex) {
+      const hex = data.catalogo.hex.replace("#", "");
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+        doc.setFillColor(r, g, b);
+        doc.setDrawColor(...GOLD);
+        doc.roundedRect(14, y - 4, 14, 5, 0.6, 0.6, "FD");
+        doc.text(`Muestra de color`, 32, y); y += 5;
+      }
+    }
+  } else if (data.tejidoNombre) { doc.text(`Tejido seleccionado: ${data.tejidoNombre}`, 14, y); y += 5; }
   doc.text(`Metraje estimado de tejido: ${data.metraje.toFixed(2).replace(".", ",")} metros`, 14, y); y += 5;
   doc.text(`Número de unidades: ${data.unidades}`, 14, y); y += 5;
 

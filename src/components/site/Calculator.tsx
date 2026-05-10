@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,32 +8,17 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import SectionHeader from "./SectionHeader";
 import BudgetDialog from "./BudgetDialog";
 import { MUEBLES, TELAS, TELA_LABELS, getMueble, type FabricCategory } from "@/lib/catalog";
-import { CATALOG_FABRICS } from "@/lib/fabricsData";
 import FabricVisualizer from "./FabricVisualizer";
-
-type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
+import type { CatalogSelection } from "./FabricCatalogPicker";
 
 export default function Calculator() {
   const [muebleKey, setMuebleKey] = useState<string>("t_sofa3");
   const [telaKey, setTelaKey] = useState<FabricCategory>("antimanchas");
   const [qty, setQty] = useState(1);
-  const [fabrics, setFabrics] = useState<Fabric[]>(CATALOG_FABRICS);
-  const [selectedFabricId, setSelectedFabricId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<CatalogSelection | null>(null);
   const [open, setOpen] = useState(false);
   const [composite, setComposite] = useState<string | null>(null);
   const [includeInPdf, setIncludeInPdf] = useState(true);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("tn_fabrics");
-      if (raw) {
-        const custom = JSON.parse(raw);
-        if (Array.isArray(custom) && custom.length > 0) setFabrics([...CATALOG_FABRICS, ...custom]);
-      }
-    } catch { /* */ }
-  }, []);
-
-  useEffect(() => { setSelectedFabricId(null); }, [telaKey]);
 
   const mueble = getMueble(muebleKey);
   const tela = TELAS[telaKey];
@@ -46,9 +31,6 @@ export default function Calculator() {
   const tapizadoOpts = MUEBLES.filter((m) => m.modalidad === "tapizado");
   const fundaOpts = MUEBLES.filter((m) => m.modalidad === "funda");
 
-  const filteredFabrics = fabrics.filter((f) => f.categoria === telaKey);
-  const selectedFabric = filteredFabrics.find((f) => f.id === selectedFabricId);
-
   return (
     <section id="presupuesto" className="section-padding bg-navy text-cream relative overflow-hidden">
       <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gold/10 blur-3xl" />
@@ -58,7 +40,6 @@ export default function Calculator() {
 
         <div className="reveal mt-14 grid lg:grid-cols-5 gap-8 items-start">
           <div className="lg:col-span-3 space-y-7 bg-navy-deep/60 backdrop-blur p-6 md:p-9 rounded-2xl border border-gold/20">
-            {/* 1. Tipo de mueble */}
             <div>
               <Label className="text-cream mb-3 block uppercase text-xs tracking-widest">1 · Tipo de mueble</Label>
               <Select value={muebleKey} onValueChange={setMuebleKey}>
@@ -85,11 +66,7 @@ export default function Calculator() {
                   <span>📐 Metraje estimado de tejido: {mueble.metraje.toFixed(2).replace(".", ",")} metros</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="Más información sobre el metraje"
-                        className="inline-flex items-center justify-center w-6 h-6 rounded-full text-gold/80 hover:text-gold hover:bg-gold/10 transition-colors"
-                      >
+                      <button type="button" aria-label="Más información sobre el metraje" className="inline-flex items-center justify-center w-6 h-6 rounded-full text-gold/80 hover:text-gold hover:bg-gold/10 transition-colors">
                         <Info size={14} />
                       </button>
                     </TooltipTrigger>
@@ -102,22 +79,17 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* 2. Tipo de tela */}
             <div>
               <Label className="text-cream mb-3 flex items-center gap-2 uppercase text-xs tracking-widest">
                 <span>2 · Tipo de tela</span>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label="Más información sobre el tipo de tela"
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-cream/60 hover:text-gold hover:bg-cream/10 transition-colors"
-                    >
+                    <button type="button" aria-label="Más información sobre el tipo de tela" className="inline-flex items-center justify-center w-6 h-6 rounded-full text-cream/60 hover:text-gold hover:bg-cream/10 transition-colors">
                       <Info size={14} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs text-xs leading-relaxed normal-case tracking-normal">
-                    Los precios varían según la composición y resistencia del tejido (algodón, antimanchas, terciopelo, bouclé...). Te asesoramos para acertar con tu uso.
+                    Los precios varían según la composición y resistencia del tejido. Te asesoramos para acertar con tu uso.
                   </TooltipContent>
                 </Tooltip>
               </Label>
@@ -133,7 +105,6 @@ export default function Calculator() {
               </Select>
             </div>
 
-            {/* 3. Cantidad */}
             <div>
               <Label className="text-cream mb-3 block uppercase text-xs tracking-widest">3 · Número de unidades</Label>
               <Input
@@ -146,35 +117,14 @@ export default function Calculator() {
               />
             </div>
 
-            {/* 4. Tejidos del catálogo (visualización) */}
-            {filteredFabrics.length > 0 && (
-              <div>
-                <Label className="text-cream mb-3 block uppercase text-xs tracking-widest">4 · Visualiza un tejido (opcional)</Label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {filteredFabrics.map((f) => {
-                    const sel = selectedFabricId === f.id;
-                    return (
-                      <button
-                        key={f.id}
-                        type="button"
-                        onClick={() => setSelectedFabricId(sel ? null : f.id)}
-                        className={`rounded-lg overflow-hidden border-2 transition-all ${sel ? "border-gold shadow-[var(--shadow-gold)]" : "border-cream/15 hover:border-gold/60"}`}
-                        title={f.nombre}
-                      >
-                        <div className="aspect-square bg-cover bg-center" style={{ backgroundImage: `url(${f.imagen})`, backgroundColor: f.color }} />
-                        <div className="px-2 py-1 text-[11px] truncate bg-navy-deep text-cream/80">{f.nombre}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-                {selectedFabric && (
-                  <div className="mt-3 text-xs text-gold">Tejido seleccionado: {selectedFabric.nombre}</div>
-                )}
+            {catalog && (
+              <div className="rounded-md bg-gold/10 border border-gold/30 px-4 py-3 text-sm text-cream">
+                <span className="text-gold font-medium">Tejido seleccionado del catálogo: </span>
+                {catalog.coleccion} · {catalog.referencia} · {catalog.color}
               </div>
             )}
           </div>
 
-          {/* RIGHT */}
           <div className="lg:col-span-2 lg:sticky lg:top-24 flex flex-col bg-gradient-to-br from-gold/15 to-gold/5 border border-gold/30 rounded-2xl p-7 md:p-9">
             <div className="text-gold uppercase tracking-[0.3em] text-xs mb-3">Precio estimado</div>
             <div className="font-display text-5xl md:text-6xl text-gold leading-none">
@@ -186,9 +136,7 @@ export default function Calculator() {
           </div>
         </div>
 
-        {/* Visualizador de mueble + tejido */}
         <FabricVisualizer
-          presetFabric={selectedFabric ? { nombre: selectedFabric.nombre, imagen: selectedFabric.imagen } : null}
           project={{
             muebleLabel: mueble.label,
             telaLabel: tela.label,
@@ -198,6 +146,8 @@ export default function Calculator() {
           onCompositeChange={setComposite}
           includeInPdf={includeInPdf}
           onIncludeChange={setIncludeInPdf}
+          catalogSelection={catalog}
+          onCatalogChange={setCatalog}
         />
 
         <div className="reveal mt-8 flex justify-center">
@@ -215,7 +165,8 @@ export default function Calculator() {
           muebleLabel: mueble.label,
           modalidad: mueble.modalidad,
           telaLabel: tela.label,
-          tejidoNombre: selectedFabric?.nombre,
+          tejidoNombre: catalog ? `${catalog.coleccion} · ${catalog.referencia} · ${catalog.color}` : undefined,
+          catalogo: catalog ?? undefined,
           metraje: mueble.metraje,
           unidades: qty,
           base: (mueble.precio + mueble.metraje * tela.price) * qty,
