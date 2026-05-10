@@ -2,7 +2,7 @@ import { Award, Palette, Clock, Truck, ShieldCheck, Heart } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 
 const items = [
-  { icon: Award, title: "+20 años de experiencia", desc: "Dos décadas perfeccionando el oficio del tapizado artesanal." },
+  { icon: Award, title: "+30 años de experiencia", desc: "Tres décadas perfeccionando el oficio del tapizado artesanal desde 1995." },
   { icon: Palette, title: "Más de 500 telas", desc: "Amplio catálogo de tejidos para cualquier estilo y necesidad." },
   { icon: Clock, title: "Presupuesto en 24h", desc: "Respuesta rápida y sin compromiso para todos tus proyectos." },
   { icon: Truck, title: "Recogida y entrega", desc: "Servicio puerta a puerta para tu mayor comodidad." },
