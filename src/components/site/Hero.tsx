@@ -21,7 +21,7 @@ export default function Hero() {
           <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <span className="h-px w-12 bg-gold" />
             <span className="text-gold uppercase tracking-[0.3em] text-xs font-medium">
-              Tapicería Artesanal · Rubí, Barcelona
+              Tapicería Artesanal
             </span>
           </div>
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-cream leading-[1.05] mb-8 opacity-0 animate-fade-in" style={{ animationDelay: "0.4s" }}>
@@ -29,7 +29,7 @@ export default function Hero() {
           </h1>
           <p className="text-lg md:text-xl text-cream/80 max-w-2xl mb-10 leading-relaxed opacity-0 animate-fade-in" style={{ animationDelay: "0.6s" }}>
             Especialistas en tapizado de sofás, sillas, cabeceros y más.
-            Más de 20 años de experiencia artesanal en Rubí, Barcelona.
+            Más de 30 años de experiencia artesanal desde 1995.
           </p>
           <div className="flex flex-wrap gap-4 opacity-0 animate-fade-in" style={{ animationDelay: "0.8s" }}>
             <Button asChild variant="gold" size="xl">
@@ -43,7 +43,7 @@ export default function Hero() {
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-cream/60 text-xs uppercase tracking-widest animate-fade-in-slow" style={{ animationDelay: "1.4s" }}>
-        Desde 2003
+        Desde 1995
       </div>
     </section>
   );
