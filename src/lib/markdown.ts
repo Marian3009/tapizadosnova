@@ -8,7 +8,10 @@ function inline(s: string) {
   return s
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-gold underline hover:text-navy">$1</a>');
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text, url) => {
+      const safe = /^(https?:\/\/|mailto:|tel:|\/|#)/i.test(url) ? url : "#";
+      return `<a href="${safe}" class="text-gold underline hover:text-navy" rel="noopener noreferrer">${text}</a>`;
+    });
 }
 
 export function markdownToHtml(md: string): string {
