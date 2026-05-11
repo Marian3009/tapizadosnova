@@ -351,24 +351,31 @@ function IdeasManager() {
     }
   };
 
-  const runAutoPublish = async () => {
-    if (!confirm("Esto generará y PUBLICARÁ automáticamente la siguiente idea pendiente, y enviará un aviso a tapizadosnova@gmail.com. ¿Continuar?")) return;
+  const runAuto = async (publish: boolean) => {
+    const msg = publish
+      ? "Esto generará y PUBLICARÁ directamente la siguiente idea pendiente, y enviará un aviso a tapizadosnova@gmail.com. ¿Continuar?"
+      : "Esto generará un BORRADOR de la siguiente idea pendiente (no se publicará). Recibirás un aviso en tapizadosnova@gmail.com para revisarlo. ¿Continuar?";
+    if (!confirm(msg)) return;
+    const secret = prompt("Introduce el secret de automatización (BLOG_AUTOMATION_SECRET):");
+    if (!secret) return;
     setAutoBusy(true);
     try {
       const { data, error } = await supabase.functions.invoke("weekly-blog-publish", {
-        body: {},
-        headers: { "x-automation-secret": prompt("Introduce el secret de automatización (BLOG_AUTOMATION_SECRET):") || "" },
+        body: { publish },
+        headers: { "x-automation-secret": secret },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.message) {
         toast.info(data.message);
+      } else if (data?.mode === "draft") {
+        toast.success(`Borrador creado: ${data?.post?.title || "artículo"}. Revísalo en Artículos.`);
       } else {
         toast.success(`Publicado: ${data?.post?.title || "artículo"}`);
       }
       load();
     } catch (e: any) {
-      toast.error(e.message || "Error en publicación automática");
+      toast.error(e.message || "Error en la automatización");
     } finally {
       setAutoBusy(false);
     }
@@ -392,24 +399,36 @@ function IdeasManager() {
   return (
     <div className="space-y-6">
       <div className="bg-navy text-cream rounded-lg p-5 md:p-6">
-        <h2 className="font-display text-xl text-gold mb-2">🤖 Publicación automática semanal</h2>
+        <h2 className="font-display text-xl text-gold mb-2">🤖 Generación automática semanal</h2>
         <p className="text-sm text-cream/80 leading-relaxed">
           Cada <strong>lunes a las 09:00 (hora de Madrid, ±1h por horario de verano)</strong>,
-          el sistema toma la siguiente idea pendiente, genera el artículo con IA, lo publica en el blog
-          y envía un aviso a <strong>tapizadosnova@gmail.com</strong>.
+          el sistema toma la siguiente idea pendiente, genera el artículo con IA como{" "}
+          <strong>borrador</strong> y te envía un aviso a <strong>tapizadosnova@gmail.com</strong>{" "}
+          para que lo revises y lo publiques manualmente desde la pestaña <em>Artículos</em>.
         </p>
         <p className="text-xs text-cream/60 mt-3">
-          También puedes lanzarla manualmente para probar — usará la siguiente idea pendiente y te pedirá el secret de automatización.
+          También puedes lanzarlo manualmente: generar un borrador para revisar, o
+          publicar directamente sin revisión.
         </p>
-        <Button
-          variant="gold"
-          size="sm"
-          className="mt-4"
-          onClick={runAutoPublish}
-          disabled={autoBusy}
-        >
-          {autoBusy ? "Ejecutando…" : "Ejecutar publicación ahora"}
-        </Button>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Button
+            variant="gold"
+            size="sm"
+            onClick={() => runAuto(false)}
+            disabled={autoBusy}
+          >
+            {autoBusy ? "Ejecutando…" : "Generar borrador ahora"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => runAuto(true)}
+            disabled={autoBusy}
+            className="bg-transparent text-cream border-cream/30 hover:bg-cream/10 hover:text-cream"
+          >
+            Publicar directamente
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">

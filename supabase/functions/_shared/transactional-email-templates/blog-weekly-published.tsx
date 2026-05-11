@@ -12,60 +12,59 @@ interface Props {
   excerpt?: string
   weekNumber?: number
   postUrl?: string
+  mode?: 'draft' | 'published'
 }
 
 const BlogWeeklyPublishedEmail = ({
-  title, slug, category, excerpt, weekNumber, postUrl,
-}: Props) => (
-  <Html lang="es" dir="ltr">
-    <Head />
-    <Preview>Nuevo artículo publicado: {title || 'sin título'}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>📝 Nuevo artículo publicado</Heading>
-        <Text style={intro}>
-          La automatización semanal del blog ha publicado un nuevo artículo
-          {weekNumber ? ` correspondiente a la semana ${weekNumber}` : ''}.
-        </Text>
-        <Section style={card}>
-          <Text style={rowLabel}>Título</Text>
-          <Text style={titleText}>{title || '—'}</Text>
-          {category && (
-            <>
-              <Text style={rowLabel}>Categoría</Text>
-              <Text style={rowText}>{category}</Text>
-            </>
-          )}
-          {excerpt && (
-            <>
-              <Text style={rowLabel}>Extracto</Text>
-              <Text style={rowText}>{excerpt}</Text>
-            </>
-          )}
-          {slug && (
-            <>
-              <Text style={rowLabel}>URL</Text>
-              <Text style={rowText}>/blog/{slug}</Text>
-            </>
-          )}
-        </Section>
-        {postUrl && (
-          <Section style={{ textAlign: 'center' as const, margin: '24px 0' }}>
-            <Button href={postUrl} style={btn}>Ver artículo</Button>
+  title, slug, category, excerpt, weekNumber, postUrl, mode = 'published',
+}: Props) => {
+  const isDraft = mode === 'draft'
+  const reviewUrl = 'https://tapizadosnova.es/admin'
+  const ctaUrl = isDraft ? reviewUrl : postUrl
+  const ctaLabel = isDraft ? 'Revisar borrador' : 'Ver artículo'
+  return (
+    <Html lang="es" dir="ltr">
+      <Head />
+      <Preview>
+        {isDraft ? 'Borrador listo para revisar' : 'Nuevo artículo publicado'}: {title || 'sin título'}
+      </Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Heading style={h1}>
+            {isDraft ? '📝 Borrador listo para revisar' : '✅ Nuevo artículo publicado'}
+          </Heading>
+          <Text style={intro}>
+            {isDraft
+              ? `La automatización semanal ha generado un nuevo borrador${weekNumber ? ` (semana ${weekNumber})` : ''}. Revísalo y publícalo manualmente desde el panel cuando esté listo.`
+              : `La automatización semanal del blog ha publicado un nuevo artículo${weekNumber ? ` correspondiente a la semana ${weekNumber}` : ''}.`}
+          </Text>
+          <Section style={card}>
+            <Text style={rowLabel}>Título</Text>
+            <Text style={titleText}>{title || '—'}</Text>
+            {category && (<><Text style={rowLabel}>Categoría</Text><Text style={rowText}>{category}</Text></>)}
+            {excerpt && (<><Text style={rowLabel}>Extracto</Text><Text style={rowText}>{excerpt}</Text></>)}
+            {slug && (<><Text style={rowLabel}>URL prevista</Text><Text style={rowText}>/blog/{slug}</Text></>)}
+            <Text style={rowLabel}>Estado</Text>
+            <Text style={rowText}>{isDraft ? 'Borrador (pendiente de revisión)' : 'Publicado'}</Text>
           </Section>
-        )}
-        <Text style={footer}>
-          Tapizados Nova · Automatización semanal del blog
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+          {ctaUrl && (
+            <Section style={{ textAlign: 'center' as const, margin: '24px 0' }}>
+              <Button href={ctaUrl} style={btn}>{ctaLabel}</Button>
+            </Section>
+          )}
+          <Text style={footer}>Tapizados Nova · Automatización semanal del blog</Text>
+        </Container>
+      </Body>
+    </Html>
+  )
+}
 
 export const template = {
   component: BlogWeeklyPublishedEmail,
   subject: (d: Record<string, any>) =>
-    `📝 Nuevo artículo publicado${d?.title ? `: ${d.title}` : ''}`,
+    d?.mode === 'draft'
+      ? `📝 Borrador listo para revisar${d?.title ? `: ${d.title}` : ''}`
+      : `✅ Nuevo artículo publicado${d?.title ? `: ${d.title}` : ''}`,
   displayName: 'Aviso interno publicación semanal',
   previewData: {
     title: 'Cómo elegir el tejido perfecto para tu sofá',
@@ -74,6 +73,7 @@ export const template = {
     excerpt: 'Una guía práctica para acertar con la tapicería de tu salón.',
     weekNumber: 12,
     postUrl: 'https://tapizadosnova.es/blog/como-elegir-tejido-sofa',
+    mode: 'draft',
   },
 } satisfies TemplateEntry
 
