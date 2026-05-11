@@ -399,24 +399,36 @@ function IdeasManager() {
   return (
     <div className="space-y-6">
       <div className="bg-navy text-cream rounded-lg p-5 md:p-6">
-        <h2 className="font-display text-xl text-gold mb-2">🤖 Publicación automática semanal</h2>
+        <h2 className="font-display text-xl text-gold mb-2">🤖 Generación automática semanal</h2>
         <p className="text-sm text-cream/80 leading-relaxed">
           Cada <strong>lunes a las 09:00 (hora de Madrid, ±1h por horario de verano)</strong>,
-          el sistema toma la siguiente idea pendiente, genera el artículo con IA, lo publica en el blog
-          y envía un aviso a <strong>tapizadosnova@gmail.com</strong>.
+          el sistema toma la siguiente idea pendiente, genera el artículo con IA como{" "}
+          <strong>borrador</strong> y te envía un aviso a <strong>tapizadosnova@gmail.com</strong>{" "}
+          para que lo revises y lo publiques manualmente desde la pestaña <em>Artículos</em>.
         </p>
         <p className="text-xs text-cream/60 mt-3">
-          También puedes lanzarla manualmente para probar — usará la siguiente idea pendiente y te pedirá el secret de automatización.
+          También puedes lanzarlo manualmente: generar un borrador para revisar, o
+          publicar directamente sin revisión.
         </p>
-        <Button
-          variant="gold"
-          size="sm"
-          className="mt-4"
-          onClick={runAutoPublish}
-          disabled={autoBusy}
-        >
-          {autoBusy ? "Ejecutando…" : "Ejecutar publicación ahora"}
-        </Button>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Button
+            variant="gold"
+            size="sm"
+            onClick={() => runAuto(false)}
+            disabled={autoBusy}
+          >
+            {autoBusy ? "Ejecutando…" : "Generar borrador ahora"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => runAuto(true)}
+            disabled={autoBusy}
+            className="bg-transparent text-cream border-cream/30 hover:bg-cream/10 hover:text-cream"
+          >
+            Publicar directamente
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
