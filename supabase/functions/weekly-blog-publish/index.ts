@@ -134,9 +134,51 @@ Devuelve SOLO JSON válido:
       featured_image_alt: parsed.featured_image_alt || parsed.title || idea.title,
       seo_title: parsed.seo_title || parsed.title || idea.title,
       seo_description: parsed.seo_description || parsed.excerpt || "",
-      status: "published" as const,
-      published_at: new Date().toISOString(),
+      status: mode,
+      published_at: shouldPublish ? new Date().toISOString() : null,
     };
+
+    const { data: post, error: insErr } = await admin
+      .from("blog_posts").insert(insert).select().single();
+    if (insErr) throw insErr;
+
+    await admin.from("blog_ideas")
+      .update({
+        status: shouldPublish ? "published" : "generated",
+        generated_post_id: post.id,
+      })
+      .eq("id", idea.id);
+
+    // ---- Internal notification email ----
+    const postUrl = `https://tapizadosnova.es/blog/${post.slug}`;
+    try {
+      await admin.functions.invoke("send-transactional-email", {
+        body: {
+          to: "tapizadosnova@gmail.com",
+          templateName: "blog-weekly-published",
+          templateData: {
+            title: post.title,
+            slug: post.slug,
+            category: post.category,
+            excerpt: post.excerpt,
+            weekNumber: idea.week_number,
+            postUrl,
+            mode,
+          },
+          idempotencyKey: `blog-weekly-${post.id}`,
+          purpose: "transactional",
+        },
+      });
+    } catch (mailErr) {
+      console.error("notification email failed (continuing):", mailErr);
+    }
+
+    return jsonRes({
+      ok: true,
+      mode,
+      post: { id: post.id, slug: post.slug, title: post.title, url: postUrl, status: mode },
+      idea_id: idea.id,
+    });
 
     const { data: post, error: insErr } = await admin
       .from("blog_posts").insert(insert).select().single();
