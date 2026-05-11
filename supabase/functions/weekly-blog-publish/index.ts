@@ -60,6 +60,10 @@ Deno.serve(async (req) => {
     let body: any = null;
     try { body = await req.json(); } catch { /* may be GET / empty */ }
     const forcedIdeaId: string | undefined = body?.idea_id;
+    // Default behaviour: generate a DRAFT for manual review.
+    // Pass { publish: true } to publish immediately (legacy behaviour).
+    const shouldPublish: boolean = body?.publish === true;
+    const mode: "draft" | "published" = shouldPublish ? "published" : "draft";
 
     // ---- Pick the next idea ----
     let ideaQuery = admin.from("blog_ideas").select("*").limit(1);
