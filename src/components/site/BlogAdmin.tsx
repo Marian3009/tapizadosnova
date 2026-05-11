@@ -351,24 +351,31 @@ function IdeasManager() {
     }
   };
 
-  const runAutoPublish = async () => {
-    if (!confirm("Esto generará y PUBLICARÁ automáticamente la siguiente idea pendiente, y enviará un aviso a tapizadosnova@gmail.com. ¿Continuar?")) return;
+  const runAuto = async (publish: boolean) => {
+    const msg = publish
+      ? "Esto generará y PUBLICARÁ directamente la siguiente idea pendiente, y enviará un aviso a tapizadosnova@gmail.com. ¿Continuar?"
+      : "Esto generará un BORRADOR de la siguiente idea pendiente (no se publicará). Recibirás un aviso en tapizadosnova@gmail.com para revisarlo. ¿Continuar?";
+    if (!confirm(msg)) return;
+    const secret = prompt("Introduce el secret de automatización (BLOG_AUTOMATION_SECRET):");
+    if (!secret) return;
     setAutoBusy(true);
     try {
       const { data, error } = await supabase.functions.invoke("weekly-blog-publish", {
-        body: {},
-        headers: { "x-automation-secret": prompt("Introduce el secret de automatización (BLOG_AUTOMATION_SECRET):") || "" },
+        body: { publish },
+        headers: { "x-automation-secret": secret },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.message) {
         toast.info(data.message);
+      } else if (data?.mode === "draft") {
+        toast.success(`Borrador creado: ${data?.post?.title || "artículo"}. Revísalo en Artículos.`);
       } else {
         toast.success(`Publicado: ${data?.post?.title || "artículo"}`);
       }
       load();
     } catch (e: any) {
-      toast.error(e.message || "Error en publicación automática");
+      toast.error(e.message || "Error en la automatización");
     } finally {
       setAutoBusy(false);
     }
