@@ -326,6 +326,7 @@ function PostsManager() {
 function IdeasManager() {
   const [list, setList] = useState<BlogIdea[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [autoBusy, setAutoBusy] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("blog_ideas").select("*").order("week_number");
@@ -350,6 +351,29 @@ function IdeasManager() {
     }
   };
 
+  const runAutoPublish = async () => {
+    if (!confirm("Esto generará y PUBLICARÁ automáticamente la siguiente idea pendiente, y enviará un aviso a tapizadosnova@gmail.com. ¿Continuar?")) return;
+    setAutoBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("weekly-blog-publish", {
+        body: {},
+        headers: { "x-automation-secret": prompt("Introduce el secret de automatización (BLOG_AUTOMATION_SECRET):") || "" },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.message) {
+        toast.info(data.message);
+      } else {
+        toast.success(`Publicado: ${data?.post?.title || "artículo"}`);
+      }
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Error en publicación automática");
+    } finally {
+      setAutoBusy(false);
+    }
+  };
+
   const skip = async (id: string) => {
     await supabase.from("blog_ideas").update({ status: "skipped" }).eq("id", id);
     load();
@@ -366,14 +390,36 @@ function IdeasManager() {
     "bg-gray-100 text-gray-700";
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="mb-5">
-        <h2 className="font-display text-xl text-navy">Ideas semanales · Calendario editorial</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Cada semana tienes una idea preparada. Pulsa <strong>Generar borrador</strong> para crear el artículo con IA.
-          El artículo se guarda como borrador y nunca se publica automáticamente — debes revisarlo y publicarlo desde la pestaña Artículos.
+    <div className="space-y-6">
+      <div className="bg-navy text-cream rounded-lg p-5 md:p-6">
+        <h2 className="font-display text-xl text-gold mb-2">🤖 Publicación automática semanal</h2>
+        <p className="text-sm text-cream/80 leading-relaxed">
+          Cada <strong>lunes a las 09:00 (hora de Madrid, ±1h por horario de verano)</strong>,
+          el sistema toma la siguiente idea pendiente, genera el artículo con IA, lo publica en el blog
+          y envía un aviso a <strong>tapizadosnova@gmail.com</strong>.
         </p>
+        <p className="text-xs text-cream/60 mt-3">
+          También puedes lanzarla manualmente para probar — usará la siguiente idea pendiente y te pedirá el secret de automatización.
+        </p>
+        <Button
+          variant="gold"
+          size="sm"
+          className="mt-4"
+          onClick={runAutoPublish}
+          disabled={autoBusy}
+        >
+          {autoBusy ? "Ejecutando…" : "Ejecutar publicación ahora"}
+        </Button>
       </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="mb-5">
+          <h2 className="font-display text-xl text-navy">Ideas semanales · Calendario editorial</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Cada semana tienes una idea preparada. La automatización publica directamente la siguiente <strong>pending</strong>.
+            También puedes <strong>generar un borrador</strong> manualmente para revisar antes de publicar.
+          </p>
+        </div>
 
       <ul className="divide-y">
         {list.map((idea) => (
