@@ -25,7 +25,7 @@ export default function FAQ() {
   }, []);
 
   return (
-    <section id="faq" className="section-padding bg-cream">
+    <section id="faq" className="section-padding pb-10 md:pb-14 bg-cream">
       <div className="container-narrow max-w-3xl">
         <SectionHeader eyebrow="FAQ" title="Preguntas frecuentes" subtitle="Resolvemos las dudas más habituales sobre nuestros servicios." />
         <Accordion type="single" collapsible className="mt-12">
