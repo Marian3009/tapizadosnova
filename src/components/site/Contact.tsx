@@ -78,7 +78,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contacto" className="section-padding bg-cream">
+    <section id="contacto" className="section-padding pt-10 md:pt-14 bg-cream">
       <div className="container-narrow max-w-3xl">
         <SectionHeader eyebrow="Contacto" title="Pide tu presupuesto sin compromiso" subtitle="Cuéntanos tu proyecto y te responderemos en menos de 24 horas." />
 
