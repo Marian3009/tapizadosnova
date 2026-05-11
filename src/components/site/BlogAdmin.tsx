@@ -453,6 +453,7 @@ function IdeasManager() {
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 }
