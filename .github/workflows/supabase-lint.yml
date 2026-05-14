@@ -46,3 +46,24 @@ jobs:
 
       - name: Run linter (fail on warnings or errors)
         run: supabase db lint --linked --level warning
+
+  migrations-dry-run:
+    name: supabase db push --dry-run
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      - name: Validate pending migrations (no changes applied)
+        run: supabase db push --linked --dry-run
