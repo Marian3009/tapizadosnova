@@ -4,7 +4,7 @@ export const DEFAULT_SETTINGS = {
   email: "tapizadosnova@gmail.com",
   address: "Calle Bilbao N1, 1ª planta, 08191 Rubí (Barcelona)",
   hours: "Lun-Vie: 9:00-18:00 · Sáb: 10:00-14:00",
-  instagram: "https://www.instagram.com/tapizeando",
+  instagram: "https://www.instagram.com/tapizados.nova",
   whatsapp: "https://wa.me/34611491661",
 };
 
