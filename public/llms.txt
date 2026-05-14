@@ -1,0 +1,21 @@
+# Tapizados Nova
+
+> Tapicería artesanal en Rubí (Barcelona) con más de 30 años de experiencia: tapizado de sofás, sillas, butacas, cabeceros a medida, restauración de muebles y fundas ajustables.
+
+Tapizados Nova es un taller familiar especializado en tapicería de calidad, con más de 500 telas disponibles, presupuestos sin compromiso y servicio en toda Cataluña. Combinamos técnicas artesanales con materiales contemporáneos (anti-manchas, terciopelos, lino y premium) y apostamos por la innovación textil sostenible.
+
+## Pages
+
+- [Inicio](/): Presentación del taller, servicios, calculadora de presupuesto, galería de proyectos, proceso de trabajo y testimonios.
+- [Blog](/blog): Artículos sobre tapicería, elección de telas, tendencias e innovación textil.
+- [Aviso legal](/aviso-legal): Información legal de la empresa.
+- [Privacidad](/privacidad): Política de privacidad y tratamiento de datos.
+
+## Blog
+
+- [Innovación Textil 2026: lo que vimos en Techtextil Frankfurt](/blog/innovacion-textil-2026-techtextil-frankfurt): Resumen de las novedades en tapicería sostenible e IA presentadas en Techtextil 2026.
+- [Cómo elegir la tela perfecta para renovar tu sofá](/blog/como-elegir-tela-perfecta-renovar-sofa): Guía práctica para escoger la tela ideal según uso, estilo y mantenimiento.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Listado completo de URLs indexables.
