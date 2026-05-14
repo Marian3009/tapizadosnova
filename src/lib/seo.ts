@@ -8,6 +8,8 @@ type SeoOptions = {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogType?: string;
   noIndex?: boolean;
+  image?: string; // absolute or root-relative URL for og:image
+  imageAlt?: string;
 };
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
@@ -32,8 +34,11 @@ function upsertLink(rel: string, href: string) {
 
 const JSONLD_ID = "seo-jsonld";
 
-export function applySeo({ title, description, path, jsonLd, ogType = "website", noIndex = false }: SeoOptions) {
+export function applySeo({ title, description, path, jsonLd, ogType = "website", noIndex = false, image, imageAlt }: SeoOptions) {
   const url = `${window.location.origin}${path}`;
+  const absImage = image
+    ? (image.startsWith("http") ? image : `${window.location.origin}${image}`)
+    : undefined;
 
   document.title = title;
   upsertMeta("name", "description", description);
@@ -46,11 +51,16 @@ export function applySeo({ title, description, path, jsonLd, ogType = "website",
   upsertMeta("property", "og:url", url);
   upsertMeta("property", "og:site_name", "Tapizados Nova");
   upsertMeta("property", "og:locale", "es_ES");
+  if (absImage) {
+    upsertMeta("property", "og:image", absImage);
+    if (imageAlt) upsertMeta("property", "og:image:alt", imageAlt);
+  }
 
   // Twitter
   upsertMeta("name", "twitter:card", "summary_large_image");
   upsertMeta("name", "twitter:title", title);
   upsertMeta("name", "twitter:description", description);
+  if (absImage) upsertMeta("name", "twitter:image", absImage);
 
   // Canonical
   upsertLink("canonical", url);
