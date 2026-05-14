@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { applySeo } from "@/lib/seo";
 
 type Status = "loading" | "valid" | "already" | "invalid" | "done" | "error";
 
@@ -10,6 +11,15 @@ export default function Unsubscribe() {
   const token = params.get("token") || "";
   const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    applySeo({
+      title: "Cancelar suscripción | Tapizados Nova",
+      description: "Gestiona tus preferencias de comunicación y cancela la suscripción a los correos de Tapizados Nova en un solo clic.",
+      path: "/unsubscribe",
+      noIndex: true,
+    });
+  }, []);
 
   useEffect(() => {
     if (!token) {
