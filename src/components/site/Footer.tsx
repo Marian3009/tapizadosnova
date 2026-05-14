@@ -40,7 +40,7 @@ export default function Footer() {
               <li className="flex items-start gap-2"><MapPin size={16} className="text-gold mt-0.5 shrink-0" /><span>Calle Bilbao N1, 1ª planta<br/>08191 Rubí (Barcelona)</span></li>
               <li className="flex items-start gap-2"><Clock size={16} className="text-gold mt-0.5 shrink-0" /><span>Lun-Vie: 9:00 - 18:00<br/>Sáb: 10:00 - 14:00</span></li>
               <li className="flex items-start gap-2"><MessageCircle size={16} className="text-gold mt-0.5 shrink-0" /><a href={s.whatsapp} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.preventDefault(); window.open(s.whatsapp, "_blank", "noopener,noreferrer"); }} className="hover:text-gold">WhatsApp: {s.phone}</a></li>
-              <li className="flex items-start gap-2"><Instagram size={16} className="text-gold mt-0.5 shrink-0" /><a href={s.instagram} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.preventDefault(); window.open(s.instagram, "_blank", "noopener,noreferrer"); }} className="hover:text-gold">@tapizeando</a></li>
+              <li className="flex items-start gap-2"><Instagram size={16} className="text-gold mt-0.5 shrink-0" /><a href={s.instagram} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.preventDefault(); window.open(s.instagram, "_blank", "noopener,noreferrer"); }} className="hover:text-gold">@tapizados.nova</a></li>
             </ul>
           </div>
         </div>

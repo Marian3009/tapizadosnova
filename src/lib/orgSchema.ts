@@ -53,7 +53,7 @@ export const organizationJsonLd = {
     },
   ],
   sameAs: [
-    "https://www.instagram.com/tapizadosnova",
+    "https://www.instagram.com/tapizados.nova",
     "https://www.facebook.com/tapizadosnova",
     "https://wa.me/34611491661",
   ],
