@@ -1,0 +1,48 @@
+name: Supabase Lint
+
+# Runs the Supabase database linter against the linked project to catch
+# new security warnings (missing RLS, mutable search_path, exposed
+# SECURITY DEFINER functions, public bucket listing, etc.) before they
+# reach production.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_ACCESS_TOKEN  Personal access token from
+#                          https://supabase.com/dashboard/account/tokens
+#   SUPABASE_PROJECT_REF   Project ref (kmiaethuwbmivsoeqxpo for this project)
+#   SUPABASE_DB_PASSWORD   Database password (Project → Settings → Database)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-lint.yml"
+  pull_request:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-lint.yml"
+  schedule:
+    # Daily safety net at 06:00 UTC in case something slips through.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: supabase db lint
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      - name: Run linter (fail on warnings or errors)
+        run: supabase db lint --linked --level warning
