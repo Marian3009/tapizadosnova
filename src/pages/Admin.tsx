@@ -13,6 +13,7 @@ import { generateBudgetPdf } from "@/lib/generateBudgetPdf";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import BlogAdmin from "@/components/site/BlogAdmin";
+import { applySeo } from "@/lib/seo";
 
 type FabricCategory = "basico" | "antimanchas" | "terciopelo" | "premium";
 type Fabric = { id: string; nombre: string; categoria: FabricCategory; color: string; imagen: string; descripcion: string };
@@ -45,7 +46,12 @@ export default function Admin() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    document.title = "Admin · Tapizados Nova";
+    applySeo({
+      title: "Panel de administración | Tapizados Nova",
+      description: "Área privada de gestión de Tapizados Nova: contenidos del blog, catálogo de telas, galería, testimonios y configuración del sitio.",
+      path: "/admin",
+      noIndex: true,
+    });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);

@@ -7,6 +7,7 @@ type SeoOptions = {
   path: string; // e.g. "/privacidad"
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogType?: string;
+  noIndex?: boolean;
 };
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
@@ -31,12 +32,12 @@ function upsertLink(rel: string, href: string) {
 
 const JSONLD_ID = "seo-jsonld";
 
-export function applySeo({ title, description, path, jsonLd, ogType = "website" }: SeoOptions) {
+export function applySeo({ title, description, path, jsonLd, ogType = "website", noIndex = false }: SeoOptions) {
   const url = `${window.location.origin}${path}`;
 
   document.title = title;
   upsertMeta("name", "description", description);
-  upsertMeta("name", "robots", "index,follow");
+  upsertMeta("name", "robots", noIndex ? "noindex,nofollow" : "index,follow");
 
   // Open Graph
   upsertMeta("property", "og:title", title);
