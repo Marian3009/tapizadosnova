@@ -90,7 +90,7 @@ const Index = () => {
       "@graph": [orgWithReviews, webSite, ...services, faqPage],
     };
 
-    applySeo({ title, description, path: "/", jsonLd });
+    applySeo({ title, description, path: "/", jsonLd, image: "/logo.png", imageAlt: "Tapizados Nova — tapicería artesanal en Barcelona" });
   }, []);
 
   return (

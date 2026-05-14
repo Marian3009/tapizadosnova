@@ -57,6 +57,8 @@ export default function BlogPost() {
       description: post.seo_description || post.excerpt || "",
       path: `/blog/${post.slug}`,
       ogType: "article",
+      image: post.featured_image_url || undefined,
+      imageAlt: post.featured_image_alt || post.title,
       jsonLd: {
         "@context": "https://schema.org",
         "@graph": [
