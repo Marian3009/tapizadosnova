@@ -77,9 +77,11 @@ export default function BlogAdmin() {
     <Tabs defaultValue="posts">
       <TabsList className="mb-4">
         <TabsTrigger value="posts">Artículos</TabsTrigger>
+        <TabsTrigger value="import">Importar</TabsTrigger>
         <TabsTrigger value="ideas">Generador semanal</TabsTrigger>
       </TabsList>
       <TabsContent value="posts"><PostsManager /></TabsContent>
+      <TabsContent value="import"><BlogImporter /></TabsContent>
       <TabsContent value="ideas"><IdeasManager /></TabsContent>
     </Tabs>
   );
