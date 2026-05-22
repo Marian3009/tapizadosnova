@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BLOG_CATEGORIES } from "@/lib/blogCategories";
+import BlogImporter from "@/components/site/BlogImporter";
 
 type Status = "draft" | "scheduled" | "published";
 
