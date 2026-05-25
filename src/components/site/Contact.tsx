@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import SectionHeader from "./SectionHeader";
 
 const schema = z.object({
@@ -19,7 +20,7 @@ const schema = z.object({
 export default function Contact() {
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const data = Object.fromEntries(fd.entries());
@@ -29,11 +30,19 @@ export default function Contact() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const { error } = await supabase.functions.invoke("send-contact", {
+        body: parsed.data,
+      });
+      if (error) throw error;
       toast.success("¡Mensaje enviado! Te contactaremos en menos de 24h.");
       (e.target as HTMLFormElement).reset();
+    } catch (err) {
+      console.error("Contact form error:", err);
+      toast.error("No se pudo enviar el mensaje. Inténtalo de nuevo o llámanos directamente.");
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
 
   return (
