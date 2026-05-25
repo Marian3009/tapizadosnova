@@ -6,6 +6,11 @@ function escape(s: string) {
 
 function inline(s: string) {
   return s
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, url) => {
+      const safe = /^(https?:\/\/|\/)/i.test(url) ? url : "";
+      if (!safe) return "";
+      return `<img src="${safe}" alt="${alt}" loading="lazy" class="my-8 w-full rounded-xl shadow-[var(--shadow-card)]" />`;
+    })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text, url) => {
