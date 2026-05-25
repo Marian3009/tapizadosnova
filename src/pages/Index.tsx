@@ -10,6 +10,7 @@ import Contact from "@/components/site/Contact";
 import Footer from "@/components/site/Footer";
 import FAQ, { DEFAULT_FAQS } from "@/components/site/FAQ";
 import Blog from "@/components/site/Blog";
+import LatestPost from "@/components/site/LatestPost";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
 import { useReveal } from "@/hooks/use-reveal";
 import { useEffect } from "react";
@@ -106,6 +107,7 @@ const Index = () => {
         <Testimonials />
         <FAQ />
         <Blog />
+        <LatestPost />
         <Contact />
       </main>
       <Footer />
