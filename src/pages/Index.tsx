@@ -106,8 +106,8 @@ const Index = () => {
         <Process />
         <Testimonials />
         <FAQ />
-        <Blog />
         <LatestPost />
+        <Blog />
         <Contact />
       </main>
       <Footer />
