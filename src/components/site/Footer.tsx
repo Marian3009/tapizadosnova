@@ -1,6 +1,7 @@
 import { Instagram, Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getSettings } from "@/lib/settings";
+import { trackWhatsappClick, trackInstagramClick } from "@/lib/tracking";
 
 export default function Footer() {
   const [s, setS] = useState(getSettings());

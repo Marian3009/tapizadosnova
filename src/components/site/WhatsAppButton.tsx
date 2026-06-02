@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSettings } from "@/lib/settings";
+import { trackWhatsappClick } from "@/lib/tracking";
 
 function normalizeWhatsapp(url: string) {
   if (!url) return "https://wa.me/34611491661";
@@ -26,13 +27,17 @@ export default function WhatsAppButton() {
     return () => window.removeEventListener("tn_settings_changed", update);
   }, []);
 
+  const trackedHref = trackWhatsappClick(href, "floating");
+
   return (
     <a
-      href={href}
+      href={trackedHref}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chatea con nosotros por WhatsApp"
       className="group fixed bottom-5 right-5 z-50"
+      data-track="click_whatsapp"
+      data-location="floating"
     >
       <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-40" />
       <span className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-lg hover:scale-110 transition-transform">
