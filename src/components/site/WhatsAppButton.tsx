@@ -1,4 +1,4 @@
-import { useEffect, useState, MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { getSettings } from "@/lib/settings";
 
 function normalizeWhatsapp(url: string) {
