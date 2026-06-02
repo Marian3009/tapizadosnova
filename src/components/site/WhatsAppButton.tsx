@@ -1,4 +1,4 @@
-import { useEffect, useState, MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { getSettings } from "@/lib/settings";
 
 function normalizeWhatsapp(url: string) {
@@ -26,18 +26,11 @@ export default function WhatsAppButton() {
     return () => window.removeEventListener("tn_settings_changed", update);
   }, []);
 
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    // Forzar apertura en pestaña externa real (evita ERR_BLOCKED_BY_RESPONSE dentro del iframe del preview)
-    e.preventDefault();
-    window.open(href, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={handleClick}
       aria-label="Chatea con nosotros por WhatsApp"
       className="group fixed bottom-5 right-5 z-50"
     >
