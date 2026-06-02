@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getSettings } from "@/lib/settings";
-import { trackWhatsappClick } from "@/lib/tracking";
+import { addUtms, logEvent } from "@/lib/tracking";
 
 function normalizeWhatsapp(url: string) {
   if (!url) return "https://wa.me/34611491661";
-  // Convertir api.whatsapp.com/send?phone=XXXX a wa.me/XXXX para evitar bloqueos de framing
   try {
     const u = new URL(url);
     if (u.hostname.includes("api.whatsapp.com")) {
@@ -20,14 +19,15 @@ function normalizeWhatsapp(url: string) {
 }
 
 export default function WhatsAppButton() {
-  const [href, setHref] = useState(normalizeWhatsapp(getSettings().whatsapp));
+  const rawHref = normalizeWhatsapp(getSettings().whatsapp);
+  const [href, setHref] = useState(rawHref);
   useEffect(() => {
     const update = () => setHref(normalizeWhatsapp(getSettings().whatsapp));
     window.addEventListener("tn_settings_changed", update);
     return () => window.removeEventListener("tn_settings_changed", update);
   }, []);
 
-  const trackedHref = trackWhatsappClick(href, "floating");
+  const trackedHref = useMemo(() => addUtms(href, "website", "floating_whatsapp"), [href]);
 
   return (
     <a
@@ -36,8 +36,7 @@ export default function WhatsAppButton() {
       rel="noopener noreferrer"
       aria-label="Chatea con nosotros por WhatsApp"
       className="group fixed bottom-5 right-5 z-50"
-      data-track="click_whatsapp"
-      data-location="floating"
+      onClick={() => logEvent("click_whatsapp", { url: href, location: "floating" })}
     >
       <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-40" />
       <span className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-lg hover:scale-110 transition-transform">
