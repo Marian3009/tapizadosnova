@@ -7,7 +7,7 @@ function getGtag(): any {
   return (window as any).gtag;
 }
 
-function logEvent(name: string, params: Record<string, any>) {
+export function logEvent(name: string, params: Record<string, any>) {
   const gtag = getGtag();
   if (typeof gtag === "function") {
     try {
