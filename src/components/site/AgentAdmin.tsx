@@ -40,18 +40,37 @@ INSTRUCCIONES: Responde en español, amable y conciso. Máximo 3 frases para res
 
 export default function AgentAdmin() {
   return (
-    <Tabs defaultValue="conversaciones">
-      <TabsList className="mb-4">
-        <TabsTrigger value="conversaciones">Conversaciones</TabsTrigger>
-        <TabsTrigger value="config">Configuración</TabsTrigger>
-        <TabsTrigger value="voz">Voz &amp; ElevenLabs</TabsTrigger>
-        <TabsTrigger value="guia">Guía de instalación</TabsTrigger>
-      </TabsList>
-      <TabsContent value="conversaciones"><ConversationsTab /></TabsContent>
-      <TabsContent value="config"><ConfigTab /></TabsContent>
-      <TabsContent value="voz"><VoiceTab /></TabsContent>
-      <TabsContent value="guia"><GuideTab /></TabsContent>
-    </Tabs>
+    <div>
+      {/* Cabecera Nova Agentia */}
+      <div className="bg-gradient-to-r from-navy to-navy/80 rounded-xl p-5 mb-5 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-gold/20 flex items-center justify-center flex-shrink-0">
+          <svg viewBox="0 0 24 24" className="w-7 h-7 text-gold fill-current">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 className="font-display text-xl text-gold leading-none">Nova Agentia</h2>
+          <p className="text-cream/60 text-sm mt-0.5">Plataforma de agentes conversacionales · Tapizados Nova</p>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full">Web activo</span>
+          <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full">WhatsApp activo</span>
+        </div>
+      </div>
+
+      <Tabs defaultValue="conversaciones">
+        <TabsList className="mb-4">
+          <TabsTrigger value="conversaciones">Conversaciones</TabsTrigger>
+          <TabsTrigger value="config">Configuración</TabsTrigger>
+          <TabsTrigger value="voz">Voz &amp; ElevenLabs</TabsTrigger>
+          <TabsTrigger value="guia">Activación</TabsTrigger>
+        </TabsList>
+        <TabsContent value="conversaciones"><ConversationsTab /></TabsContent>
+        <TabsContent value="config"><ConfigTab /></TabsContent>
+        <TabsContent value="voz"><VoiceTab /></TabsContent>
+        <TabsContent value="guia"><GuideTab /></TabsContent>
+      </Tabs>
+    </div>
   );
 }
 
@@ -392,20 +411,24 @@ function VoiceTab() {
 function GuideTab() {
   return (
     <div className="bg-white rounded-lg shadow p-4 md:p-6 space-y-6">
-      <h2 className="font-display text-xl text-navy">Guía completa de activación</h2>
+      <h2 className="font-display text-xl text-navy">Activación de Nova Agentia</h2>
 
       {/* Paso 1: Agente web */}
-      <Section title="1. Activar el agente de chat web" color="blue">
-        <p className="text-sm text-gray-700 mb-3">
-          El widget ya está activo en la web. Para que tenga inteligencia, añade el secreto en Supabase:
+      <Section title="1. Activar el agente de chat web (IA)" color="blue">
+        <p className="text-sm text-gray-700 mb-2">
+          <strong>Opción A — Anthropic (recomendado):</strong> Ve a{" "}
+          <span className="font-mono text-xs bg-gray-100 px-1 rounded">app.supabase.com → tu proyecto → Edge Functions → Secrets</span>
         </p>
-        <CodeBlock>
-          {`# Supabase Dashboard → Edge Functions → Secrets → New Secret
-ANTHROPIC_API_KEY = sk-ant-...
-# Obtén tu clave en: console.anthropic.com`}
-        </CodeBlock>
-        <p className="text-sm text-gray-700 mt-3">
-          Luego despliega la función: <code className="bg-gray-100 px-1 rounded text-xs">supabase functions deploy voice-agent</code>
+        <CodeBlock>{`ANTHROPIC_API_KEY = sk-ant-...
+# Consigue tu clave en: console.anthropic.com`}</CodeBlock>
+        <p className="text-sm text-gray-700 mt-3 mb-2">
+          <strong>Opción B — Ya funciona:</strong> Si ya tienes <code className="bg-gray-100 px-1 rounded text-xs">LOVABLE_API_KEY</code> en Supabase (lo tienes), el agente ya tiene IA activa como fallback.
+        </p>
+        <p className="text-sm text-gray-700 mt-2">
+          Despliega las funciones desde{" "}
+          <span className="font-mono text-xs bg-gray-100 px-1 rounded">Supabase → Edge Functions → Deploy</span>{" "}
+          seleccionando <code className="bg-gray-100 px-1 rounded text-xs">voice-agent</code> y{" "}
+          <code className="bg-gray-100 px-1 rounded text-xs">elevenlabs-tts</code>.
         </p>
       </Section>
 

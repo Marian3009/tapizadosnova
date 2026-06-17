@@ -175,7 +175,7 @@ export default function Admin() {
             <TabsTrigger value="testimonios">Testimonios</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
             <TabsTrigger value="config">Configuración</TabsTrigger>
-            <TabsTrigger value="agente">Agente IA</TabsTrigger>
+            <TabsTrigger value="agente">Nova Agentia</TabsTrigger>
           </TabsList>
 
           <TabsContent value="presupuestos"><BudgetsAdmin /></TabsContent>
