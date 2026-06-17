@@ -1,10 +1,11 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Rate limit: 20 req / 60s por IP
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 20;
 const ipHits = new Map<string, number[]>();
@@ -18,52 +19,38 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-const SYSTEM_PROMPT = `Eres el asistente virtual de Tapizados Nova, empresa familiar de tapicería artesanal en Rubí (Barcelona) con más de 30 años de experiencia desde 1995. Hablas directamente con clientes potenciales.
+const DEFAULT_SYSTEM_PROMPT = `Eres el asistente virtual de Tapizados Nova, empresa familiar de tapicería artesanal en Rubí (Barcelona) con más de 30 años de experiencia desde 1995.
 
 DATOS DE CONTACTO:
 - Dirección: Calle Bilbao N1, 1ª planta, 08191 Rubí (Barcelona)
 - Teléfono/WhatsApp: +34 611 491 661
 - Email: tapizadosnova@gmail.com
 - Web: tapizadosnova.es
-- Horario: Lunes a Viernes 9:00-18:00, Sábados 9:00-14:00
+- Horario: Lunes a Viernes 9:00-18:00h, Sábados 9:00-14:00h
 
-SERVICIOS Y PRECIOS ORIENTATIVOS (mano de obra + tela):
-- Asiento silla: desde 55€ (básica) hasta 77€ (premium)
-- Silla completa (asiento+respaldo): desde 84€ hasta 144€
-- Butaca: desde 320€ hasta 545€
-- Sofá 2 plazas: desde 670€ hasta 1.220€
-- Sofá 3 plazas: desde 820€ hasta 1.520€
-- Rinconera: desde 1.210€ hasta 2.110€
-- Chaise longue: desde 800€ hasta 1.300€
-- Cabeceros: presupuesto personalizado
+SERVICIOS Y PRECIOS ORIENTATIVOS:
+- Asiento silla: desde 55€ | Silla completa: desde 84€
+- Butaca: desde 320€ | Butaca XL: desde 430€ | Sillón orejero: desde 430€
+- Sofá 2 plazas: desde 670€ | Sofá 3 plazas: desde 820€
+- Chaise longue: desde 800€ | Rinconera: desde 1.210€
+- Cabeceros a medida: presupuesto personalizado
 
-TELAS DISPONIBLES (más de 500 opciones):
-- Básica: desde 20€/metro
-- Antimanchas: desde 35€/metro
-- Terciopelo: desde 35€/metro
-- Lino y Premium: desde 70€/metro
+TELAS (más de 500 opciones):
+- Básica: desde 20€/m | Antimanchas: 35€/m | Terciopelo: 35€/m | Premium/Lino: 70€/m
 
-PLAZOS: habitualmente 1-2 semanas según carga de trabajo.
-RECOGIDA: disponible con servicio a domicilio en el área de Barcelona.
-PRESUPUESTO: gratuito y sin compromiso. Calculadora online en tapizadosnova.es.
+PLAZOS: 1-2 semanas. Recogida a domicilio disponible en área de Barcelona.
 
-INSTRUCCIONES DE RESPUESTA:
-- Responde siempre en español, con tono amable y profesional
-- Para voz: máximo 2-3 frases cortas y directas
-- Si piden presupuesto exacto: invítales a usar la calculadora en la web o a contactar por WhatsApp al +34 611 491 661
-- Si no sabes algo: indica que pueden llamar o escribir al WhatsApp
-- No inventes precios fuera de los rangos indicados`;
+INSTRUCCIONES:
+- Responde en español, amable y conciso (máximo 3 frases para voz)
+- Para presupuesto exacto: invita a la calculadora en tapizadosnova.es o al WhatsApp
+- Si no sabes algo, indica que llamen al +34 611 491 661`;
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-    req.headers.get("cf-connecting-ip") ||
-    "unknown";
-
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
   if (isRateLimited(ip)) {
     return new Response(JSON.stringify({ error: "rate_limit" }), {
       status: 429,
@@ -71,10 +58,15 @@ Deno.serve(async (req) => {
     });
   }
 
+  const supaUrl = Deno.env.get("SUPABASE_URL")!;
+  const supaServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const db = createClient(supaUrl, supaServiceKey);
+
   try {
-    const { message, history = [] } = await req.json() as {
+    const { message, history = [], session_id } = await req.json() as {
       message: string;
       history: ChatMessage[];
+      session_id?: string;
     };
 
     if (!message?.trim()) {
@@ -84,21 +76,29 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Cargar configuración del agente desde admin panel
+    let systemPrompt = DEFAULT_SYSTEM_PROMPT;
+    try {
+      const { data: cfg } = await db
+        .from("agent_config")
+        .select("system_prompt")
+        .eq("id", "default")
+        .maybeSingle();
+      if (cfg?.system_prompt?.trim()) systemPrompt = cfg.system_prompt;
+    } catch { /* usa el prompt por defecto */ }
+
     const apiKey = Deno.env.get("ANTHROPIC_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
-      console.error("No AI API key configured (ANTHROPIC_API_KEY or LOVABLE_API_KEY)");
       return new Response(JSON.stringify({ error: "configuration_error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const useAnthropic = !!Deno.env.get("ANTHROPIC_API_KEY");
     const recentHistory = history.slice(-8) as ChatMessage[];
-
     let reply: string;
 
-    if (useAnthropic) {
+    if (Deno.env.get("ANTHROPIC_API_KEY")) {
       const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -109,46 +109,52 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 300,
-          system: SYSTEM_PROMPT,
+          system: systemPrompt,
           messages: [...recentHistory, { role: "user", content: message }],
         }),
       });
-
-      if (!aiRes.ok) {
-        const t = await aiRes.text();
-        console.error("Anthropic API error", aiRes.status, t);
-        throw new Error(`AI error ${aiRes.status}`);
-      }
-
+      if (!aiRes.ok) throw new Error(`Anthropic ${aiRes.status}`);
       const data = await aiRes.json();
-      reply = data.content?.[0]?.text ?? "Lo siento, no pude procesar tu consulta.";
+      reply = data.content?.[0]?.text ?? "Lo siento, no pude responder en este momento.";
     } else {
-      // Lovable AI gateway (OpenAI-compatible)
       const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({
           model: "anthropic/claude-3-5-haiku-20241022",
           max_tokens: 300,
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: systemPrompt },
             ...recentHistory,
             { role: "user", content: message },
           ],
         }),
       });
-
-      if (!aiRes.ok) {
-        const t = await aiRes.text();
-        console.error("Lovable gateway error", aiRes.status, t);
-        throw new Error(`AI error ${aiRes.status}`);
-      }
-
+      if (!aiRes.ok) throw new Error(`Lovable gateway ${aiRes.status}`);
       const data = await aiRes.json();
-      reply = data.choices?.[0]?.message?.content ?? "Lo siento, no pude procesar tu consulta.";
+      reply = data.choices?.[0]?.message?.content ?? "Lo siento, no pude responder.";
+    }
+
+    // Guardar conversación en DB (sin bloquear la respuesta)
+    if (session_id) {
+      const updatedMessages = [
+        ...recentHistory,
+        { role: "user", content: message },
+        { role: "assistant", content: reply },
+      ];
+      db.from("agent_conversations")
+        .upsert(
+          {
+            id: session_id,
+            channel: "web",
+            contact: "web-" + ip.slice(0, 8),
+            messages: updatedMessages,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "id" }
+        )
+        .then(() => {})
+        .catch((e: Error) => console.error("Failed to save conversation:", e));
     }
 
     return new Response(JSON.stringify({ reply }), {
@@ -157,7 +163,10 @@ Deno.serve(async (req) => {
   } catch (e) {
     console.error("voice-agent error:", e);
     return new Response(
-      JSON.stringify({ error: "internal_error", reply: "Lo siento, ha habido un problema técnico. Por favor contacta al +34 611 491 661." }),
+      JSON.stringify({
+        error: "internal_error",
+        reply: "Lo siento, ha habido un error técnico. Puedes contactarnos al +34 611 491 661.",
+      }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
