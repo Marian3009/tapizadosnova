@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# WhatsApp agent credentials (never commit)
+server/auth_info_baileys/
+server/.env
+server/dist/

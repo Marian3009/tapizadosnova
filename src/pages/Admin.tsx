@@ -13,6 +13,7 @@ import { generateBudgetPdf } from "@/lib/generateBudgetPdf";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import BlogAdmin from "@/components/site/BlogAdmin";
+import AgentAdmin from "@/components/site/AgentAdmin";
 import { applySeo } from "@/lib/seo";
 
 type FabricCategory = "basico" | "antimanchas" | "terciopelo" | "premium";
@@ -174,6 +175,7 @@ export default function Admin() {
             <TabsTrigger value="testimonios">Testimonios</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
             <TabsTrigger value="config">Configuración</TabsTrigger>
+            <TabsTrigger value="agente">Nova Agentia</TabsTrigger>
           </TabsList>
 
           <TabsContent value="presupuestos"><BudgetsAdmin /></TabsContent>
@@ -183,6 +185,7 @@ export default function Admin() {
           <TabsContent value="testimonios"><TestimoniosAdmin /></TabsContent>
           <TabsContent value="faq"><FaqAdmin /></TabsContent>
           <TabsContent value="config"><ConfigAdmin /></TabsContent>
+          <TabsContent value="agente"><AgentAdmin /></TabsContent>
         </Tabs>
       </main>
     </div>

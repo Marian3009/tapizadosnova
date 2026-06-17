@@ -12,6 +12,7 @@ import FAQ, { DEFAULT_FAQS } from "@/components/site/FAQ";
 import Blog from "@/components/site/Blog";
 import LatestPost from "@/components/site/LatestPost";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
+import VoiceAgent from "@/components/site/VoiceAgent";
 import { useReveal } from "@/hooks/use-reveal";
 import { useEffect } from "react";
 import { applySeo } from "@/lib/seo";
@@ -112,6 +113,7 @@ const Index = () => {
       </main>
       <Footer />
       <WhatsAppButton />
+      <VoiceAgent />
     </div>
   );
 };

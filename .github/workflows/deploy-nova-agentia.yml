@@ -1,0 +1,70 @@
+name: Nova Agentia · Deploy
+
+# Despliega las Edge Functions y aplica migraciones de Nova Agentia.
+# Se activa automáticamente al mergear cambios en supabase/ a main,
+# y manualmente desde GitHub Actions → Run workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_functions:
+        description: 'Desplegar Edge Functions'
+        type: boolean
+        default: true
+      apply_migrations:
+        description: 'Aplicar migraciones de base de datos'
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/migrations/**'
+
+jobs:
+  deploy:
+    name: Deploy Nova Agentia
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # ── Edge Functions ──────────────────────────────────────────────
+      - name: Deploy voice-agent
+        if: ${{ github.event_name == 'push' || inputs.deploy_functions }}
+        run: |
+          supabase functions deploy voice-agent \
+            --project-ref kmiaethuwbmivsoeqxpo \
+            --no-verify-jwt
+
+      - name: Deploy elevenlabs-tts
+        if: ${{ github.event_name == 'push' || inputs.deploy_functions }}
+        run: |
+          supabase functions deploy elevenlabs-tts \
+            --project-ref kmiaethuwbmivsoeqxpo \
+            --no-verify-jwt
+
+      # ── Migraciones ─────────────────────────────────────────────────
+      - name: Apply database migrations
+        if: ${{ github.event_name == 'push' || inputs.apply_migrations }}
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase db push \
+            --linked \
+            --project-ref kmiaethuwbmivsoeqxpo
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Nova Agentia desplegada correctamente"
+          echo "   · voice-agent Edge Function actualizada"
+          echo "   · elevenlabs-tts Edge Function desplegada"
+          echo "   · Migraciones de base de datos aplicadas"
+          echo "   · Panel admin disponible en tapizadosnova.es/admin → Nova Agentia"
