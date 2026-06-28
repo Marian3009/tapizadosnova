@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as supabaseTyped } from "@/integrations/supabase/client";
+const supabase: any = supabaseTyped;
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -19,8 +20,8 @@ async function playBase64Audio(base64: string): Promise<void> {
 
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 
@@ -38,7 +39,7 @@ export default function VoiceAgent() {
     "¡Hola! Soy el asistente virtual de Tapizados Nova. ¿En qué te puedo ayudar con el tapizado de tu mueble?"
   );
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -164,7 +165,7 @@ export default function VoiceAgent() {
     rec.lang = "es-ES";
     rec.continuous = false;
     rec.interimResults = false;
-    rec.onresult = (e: SpeechRecognitionEvent) => sendMessage(e.results[0][0].transcript);
+    rec.onresult = (e: any) => sendMessage(e.results[0][0].transcript);
     rec.onend = () => setIsListening(false);
     rec.onerror = () => setIsListening(false);
     recognitionRef.current = rec;
