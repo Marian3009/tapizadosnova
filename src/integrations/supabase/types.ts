@@ -199,6 +199,189 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_items: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          destacado: boolean
+          fabric_reference_id: string | null
+          id: string
+          imagen_antes: string | null
+          imagen_despues: string | null
+          imagen_principal: string | null
+          orden: number
+          publicado: boolean
+          tipo_trabajo: string | null
+          titulo: string
+          ubicacion: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          destacado?: boolean
+          fabric_reference_id?: string | null
+          id?: string
+          imagen_antes?: string | null
+          imagen_despues?: string | null
+          imagen_principal?: string | null
+          orden?: number
+          publicado?: boolean
+          tipo_trabajo?: string | null
+          titulo: string
+          ubicacion?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          destacado?: boolean
+          fabric_reference_id?: string | null
+          id?: string
+          imagen_antes?: string | null
+          imagen_despues?: string | null
+          imagen_principal?: string | null
+          orden?: number
+          publicado?: boolean
+          tipo_trabajo?: string | null
+          titulo?: string
+          ubicacion?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          atendido_at: string | null
+          created_at: string
+          datos: Json
+          email: string | null
+          estado: string
+          id: string
+          mensaje: string | null
+          nombre: string | null
+          origen: string
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          atendido_at?: string | null
+          created_at?: string
+          datos?: Json
+          email?: string | null
+          estado?: string
+          id?: string
+          mensaje?: string | null
+          nombre?: string | null
+          origen: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          atendido_at?: string | null
+          created_at?: string
+          datos?: Json
+          email?: string | null
+          estado?: string
+          id?: string
+          mensaje?: string | null
+          nombre?: string | null
+          origen?: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          descripcion_corta: string | null
+          descripcion_larga: string | null
+          destacado: boolean
+          fabric_uso_filtro: string | null
+          faq: Json
+          icono: string | null
+          id: string
+          imagen_principal: string | null
+          imagenes: string[]
+          incluye: string[]
+          meta_descripcion: string | null
+          meta_titulo: string | null
+          nombre: string
+          orden: number
+          pasos: Json
+          publicado: boolean
+          slug: string
+          titulo_largo: string | null
+          updated_at: string
+          work_type_codigo: string | null
+        }
+        Insert: {
+          created_at?: string
+          descripcion_corta?: string | null
+          descripcion_larga?: string | null
+          destacado?: boolean
+          fabric_uso_filtro?: string | null
+          faq?: Json
+          icono?: string | null
+          id?: string
+          imagen_principal?: string | null
+          imagenes?: string[]
+          incluye?: string[]
+          meta_descripcion?: string | null
+          meta_titulo?: string | null
+          nombre: string
+          orden?: number
+          pasos?: Json
+          publicado?: boolean
+          slug: string
+          titulo_largo?: string | null
+          updated_at?: string
+          work_type_codigo?: string | null
+        }
+        Update: {
+          created_at?: string
+          descripcion_corta?: string | null
+          descripcion_larga?: string | null
+          destacado?: boolean
+          fabric_uso_filtro?: string | null
+          faq?: Json
+          icono?: string | null
+          id?: string
+          imagen_principal?: string | null
+          imagenes?: string[]
+          incluye?: string[]
+          meta_descripcion?: string | null
+          meta_titulo?: string | null
+          nombre?: string
+          orden?: number
+          pasos?: Json
+          publicado?: boolean
+          slug?: string
+          titulo_largo?: string | null
+          updated_at?: string
+          work_type_codigo?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -220,6 +403,51 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          autor: string
+          avatar: string | null
+          ciudad: string | null
+          created_at: string
+          destacado: boolean
+          fecha: string | null
+          id: string
+          orden: number
+          publicado: boolean
+          rating: number | null
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          autor: string
+          avatar?: string | null
+          ciudad?: string | null
+          created_at?: string
+          destacado?: boolean
+          fecha?: string | null
+          id?: string
+          orden?: number
+          publicado?: boolean
+          rating?: number | null
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          autor?: string
+          avatar?: string | null
+          ciudad?: string | null
+          created_at?: string
+          destacado?: boolean
+          fecha?: string | null
+          id?: string
+          orden?: number
+          publicado?: boolean
+          rating?: number | null
+          texto?: string
+          updated_at?: string
         }
         Relationships: []
       }
