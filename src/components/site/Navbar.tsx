@@ -11,6 +11,8 @@ const links = [
   { href: "/#contacto", label: "Contacto" },
 ];
 
+const ARTEMPO_URL = "https://www.artempohomedesign.es";
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -43,6 +45,14 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
+          <a
+            href={ARTEMPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm uppercase tracking-widest text-gold/80 hover:text-gold border border-gold/30 hover:border-gold/60 px-3 py-1.5 rounded-full transition-all duration-300"
+          >
+            Tienda ↗
+          </a>
           <Button asChild variant="gold" size="sm">
             <a href="#contacto">Pedir presupuesto</a>
           </Button>
@@ -71,6 +81,15 @@ export default function Navbar() {
                 {l.label}
               </a>
             ))}
+            <a
+              href={ARTEMPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="text-gold py-3 min-h-[44px] flex items-center uppercase tracking-widest text-sm border-t border-gold/20 pt-4"
+            >
+              Tienda Artempo Home Design ↗
+            </a>
             <Button asChild variant="gold" className="mt-2">
               <a href="#contacto" onClick={() => setOpen(false)}>Pedir presupuesto</a>
             </Button>

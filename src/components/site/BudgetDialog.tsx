@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { toast } from "sonner";
 import { generateBudgetPdf, buildBudgetNumber, type BudgetData, type CatalogoInfo } from "@/lib/generateBudgetPdf";
 import { getSettings } from "@/lib/settings";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Indica tu nombre").max(100),
@@ -47,7 +48,7 @@ export type SavedBudget = {
   estado: "pendiente" | "contactado" | "confirmado";
 };
 
-function persistBudget(b: SavedBudget) {
+function persistBudgetLocal(b: SavedBudget) {
   try {
     const raw = localStorage.getItem("tn_budgets");
     const list: SavedBudget[] = raw ? JSON.parse(raw) : [];
@@ -56,10 +57,83 @@ function persistBudget(b: SavedBudget) {
   } catch { /* */ }
 }
 
+async function persistBudgetSupabase(data: BudgetData, hasComposite: boolean) {
+  try {
+    await supabase.from("budget_requests").insert({
+      numero: data.numero,
+      fecha: data.fecha,
+      nombre: data.cliente.nombre,
+      email: data.cliente.email,
+      telefono: data.cliente.telefono ?? null,
+      direccion: data.cliente.direccion ?? null,
+      mueble_label: data.muebleLabel,
+      tela_label: data.telaLabel,
+      tejido_nombre: data.tejidoNombre ?? null,
+      modalidad: data.modalidad,
+      metraje: data.metraje,
+      unidades: data.unidades,
+      base: data.base,
+      iva: data.iva,
+      total: data.total,
+      anticipo: data.anticipo,
+      estado: "pendiente",
+      has_composite: hasComposite,
+    });
+  } catch (err) {
+    console.warn("Budget Supabase save failed (non-critical):", err);
+  }
+}
+
+async function sendBudgetEmails(data: BudgetData) {
+  const templateData = {
+    numero: data.numero,
+    fecha: data.fecha,
+    nombre: data.cliente.nombre,
+    email: data.cliente.email,
+    telefono: data.cliente.telefono,
+    direccion: data.cliente.direccion,
+    muebleLabel: data.muebleLabel,
+    telaLabel: data.telaLabel,
+    tejidoNombre: data.tejidoNombre,
+    modalidad: data.modalidad,
+    metraje: String(data.metraje),
+    unidades: String(data.unidades),
+    base: data.base.toFixed(2),
+    iva: data.iva.toFixed(2),
+    total: data.total.toFixed(2),
+    anticipo: data.anticipo.toFixed(2),
+    iban: data.iban,
+  };
+
+  // Notification to business (fixed recipient in the template)
+  const notifPromise = supabase.functions.invoke("send-transactional-email", {
+    body: {
+      templateName: "budget-notification",
+      templateData,
+    },
+  });
+
+  // Confirmation to client
+  const confirmPromise = supabase.functions.invoke("send-transactional-email", {
+    body: {
+      templateName: "budget-confirmation",
+      recipientEmail: data.cliente.email,
+      templateData,
+    },
+  });
+
+  const [notif, confirm] = await Promise.allSettled([notifPromise, confirmPromise]);
+
+  if (notif.status === "rejected" || confirm.status === "rejected") {
+    console.warn("One or more budget emails failed:", { notif, confirm });
+  }
+}
+
 export default function BudgetDialog({ open, onOpenChange, context }: Props) {
   const [form, setForm] = useState({ nombre: "", email: "", telefono: "", direccion: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
+  const [sending, setSending] = useState(false);
   const [includeImage, setIncludeImage] = useState(true);
 
   const iva = +(context.base * 0.21).toFixed(2);
@@ -103,35 +177,49 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
     return true;
   };
 
-  const saveAndPdf = () => {
+  const handleDownload = () => {
+    if (!validate()) return;
     const data = buildData();
-    persistBudget({
+    persistBudgetLocal({
       numero: data.numero, fecha: data.fecha, cliente: data.cliente,
       muebleLabel: data.muebleLabel, telaLabel: data.telaLabel, tejidoNombre: data.tejidoNombre,
       modalidad: data.modalidad, metraje: data.metraje, unidades: data.unidades,
       base: data.base, total: data.total, estado: "pendiente",
     });
-    return { data, doc: generateBudgetPdf(data) };
-  };
-
-  const handleDownload = () => {
-    if (!validate()) return;
-    const { data, doc } = saveAndPdf();
+    persistBudgetSupabase(data, !!(includeImage && context.composite));
+    const doc = generateBudgetPdf(data);
     doc.save(`${data.numero}.pdf`);
     setSuccess(true);
   };
 
-  const handleEmail = () => {
+  const handleEmail = async () => {
     if (!validate()) return;
-    const { data, doc } = saveAndPdf();
-    doc.save(`${data.numero}.pdf`);
-    toast.success(`Presupuesto enviado a ${data.cliente.email}.`);
-    setSuccess(true);
+    setSending(true);
+    try {
+      const data = buildData();
+      persistBudgetLocal({
+        numero: data.numero, fecha: data.fecha, cliente: data.cliente,
+        muebleLabel: data.muebleLabel, telaLabel: data.telaLabel, tejidoNombre: data.tejidoNombre,
+        modalidad: data.modalidad, metraje: data.metraje, unidades: data.unidades,
+        base: data.base, total: data.total, estado: "pendiente",
+      });
+      await persistBudgetSupabase(data, !!(includeImage && context.composite));
+      await sendBudgetEmails(data);
+      // Also generate and download the PDF
+      const doc = generateBudgetPdf(data);
+      doc.save(`${data.numero}.pdf`);
+      setSuccess(true);
+    } catch (err) {
+      console.error("handleEmail error:", err);
+      toast.error("No se pudo enviar el email. Descarga el PDF e inténtalo de nuevo.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const reset = () => {
     setForm({ nombre: "", email: "", telefono: "", direccion: "" });
-    setErrors({}); setSuccess(false);
+    setErrors({}); setSuccess(false); setSending(false);
   };
 
   return (
@@ -145,7 +233,10 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
         {success ? (
           <div className="rounded-lg border border-gold/40 bg-white p-5 text-center">
             <p className="text-green-700 font-medium">✅ Presupuesto generado correctamente.</p>
-            <p className="text-sm text-muted-foreground mt-2">Nos pondremos en contacto contigo para confirmar los detalles.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Te hemos enviado una confirmación por email. Nos pondremos en contacto contigo
+              en menos de 24 h para confirmar los detalles.
+            </p>
             <Button className="mt-4" variant="gold" onClick={() => onOpenChange(false)}>Cerrar</Button>
           </div>
         ) : (
@@ -189,8 +280,12 @@ export default function BudgetDialog({ open, onOpenChange, context }: Props) {
             )}
 
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
-              <Button variant="gold" onClick={handleDownload}>📄 Descargar PDF</Button>
-              <Button variant="outline-gold" onClick={handleEmail}>📧 Enviar al email</Button>
+              <Button variant="gold" onClick={handleDownload} disabled={sending}>
+                📄 Descargar PDF
+              </Button>
+              <Button variant="outline-gold" onClick={handleEmail} disabled={sending}>
+                {sending ? "⏳ Enviando..." : "📧 Enviar al email"}
+              </Button>
             </div>
           </div>
         )}

@@ -18,7 +18,7 @@ export default function Footer() {
   return (
     <footer className="bg-navy-deep text-cream/80 pt-16 pb-8 px-6">
       <div className="container-narrow">
-        <div className="grid md:grid-cols-3 gap-10 pb-12 border-b border-gold/15">
+        <div className="grid md:grid-cols-4 gap-10 pb-12 border-b border-gold/15">
           <div>
             <div className="font-display text-3xl text-gold mb-4">
               Tapizados <span className="italic font-normal">Nova</span>
@@ -36,6 +36,21 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+          <div>
+            <h4 className="font-display text-lg text-gold mb-4">Artempo Home Design</h4>
+            <p className="text-cream/60 text-sm leading-relaxed mb-3">
+              Nuestra tienda online de tejidos premium para tapicería.
+            </p>
+            <a
+              href="https://www.artempohomedesign.es"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-gold/80 hover:text-gold border border-gold/30 hover:border-gold/60 px-3 py-1.5 rounded-full transition-all duration-300"
+              onClick={() => logEvent("click_artempo", { location: "footer" })}
+            >
+              artempohomedesign.es ↗
+            </a>
           </div>
           <div>
             <h4 className="font-display text-lg text-gold mb-4">Contacto</h4>
