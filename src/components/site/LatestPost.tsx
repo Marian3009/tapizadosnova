@@ -5,6 +5,7 @@ import SectionHeader from "./SectionHeader";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { markdownToHtml } from "@/lib/markdown";
+import BlogSubscribe from "./BlogSubscribe";
 
 interface PostRow {
   id: string;
@@ -109,6 +110,11 @@ export default function LatestPost() {
             </Button>
           </div>
         </article>
+
+        {/* Newsletter subscription */}
+        <div className="reveal mt-14">
+          <BlogSubscribe />
+        </div>
       </div>
     </section>
   );

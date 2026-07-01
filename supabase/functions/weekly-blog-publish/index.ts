@@ -233,6 +233,9 @@ Examples: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
       .eq("id", idea.id);
 
     const postUrl = `https://tapizadosnova.es/blog/${post.slug}`;
+    const supaFnUrl = Deno.env.get("SUPABASE_URL")!;
+
+    // Internal notification to site owner
     try {
       await admin.functions.invoke("send-transactional-email", {
         body: {
@@ -250,7 +253,48 @@ Examples: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
         },
       });
     } catch (mailErr) {
-      console.error("notification email failed (continuing):", mailErr);
+      console.error("owner notification failed (continuing):", mailErr);
+    }
+
+    // Newsletter to confirmed subscribers (only when publishing, not draft)
+    let newsletterSent = 0;
+    if (shouldPublish) {
+      try {
+        const { data: subscribers } = await admin
+          .from("blog_subscribers")
+          .select("email, unsubscribe_token")
+          .not("confirmed_at", "is", null)
+          .is("unsubscribed_at", null);
+
+        if (subscribers && subscribers.length > 0) {
+          const baseUnsubUrl = `${supaFnUrl}/functions/v1/handle-email-unsubscribe?token=`;
+          for (const sub of subscribers) {
+            try {
+              await admin.functions.invoke("send-transactional-email", {
+                body: {
+                  templateName: "blog-newsletter",
+                  recipientEmail: sub.email,
+                  templateData: {
+                    title: post.title,
+                    excerpt: post.excerpt,
+                    category: post.category,
+                    postUrl,
+                    featuredImageUrl: post.featured_image_url,
+                    featuredImageAlt: post.featured_image_alt,
+                    unsubscribeUrl: baseUnsubUrl + sub.unsubscribe_token,
+                  },
+                  idempotencyKey: `blog-nl-${post.id}-${sub.email}`,
+                },
+              });
+              newsletterSent++;
+            } catch (subErr) {
+              console.error(`newsletter to ${sub.email} failed:`, subErr);
+            }
+          }
+        }
+      } catch (nlErr) {
+        console.error("newsletter batch failed (continuing):", nlErr);
+      }
     }
 
     return jsonRes({
@@ -259,6 +303,7 @@ Examples: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
       post: { id: post.id, slug: post.slug, title: post.title, url: postUrl, status: mode },
       idea_id: idea.id,
       images_injected: imageQueries.length,
+      newsletter_sent: newsletterSent,
     });
   } catch (e) {
     console.error("weekly-blog-publish error:", e);
