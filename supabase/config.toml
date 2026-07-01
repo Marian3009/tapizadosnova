@@ -21,6 +21,9 @@ verify_jwt = false
 [functions.weekly-blog-publish]
 verify_jwt = false
 
+[functions.instagram-auto-post]
+verify_jwt = false
+
 [functions.voice-agent]
 verify_jwt = false
 
