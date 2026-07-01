@@ -59,7 +59,7 @@ function persistBudgetLocal(b: SavedBudget) {
 
 async function persistBudgetSupabase(data: BudgetData, hasComposite: boolean) {
   try {
-    await supabase.from("budget_requests").insert({
+    await (supabase as any).from("budget_requests").insert({
       numero: data.numero,
       fecha: data.fecha,
       nombre: data.cliente.nombre,
@@ -83,6 +83,7 @@ async function persistBudgetSupabase(data: BudgetData, hasComposite: boolean) {
     console.warn("Budget Supabase save failed (non-critical):", err);
   }
 }
+
 
 async function sendBudgetEmails(data: BudgetData) {
   const templateData = {
