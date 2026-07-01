@@ -134,6 +134,19 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Reject anon-key calls attempting to trigger server-only templates.
+  if (SERVER_ONLY_TEMPLATES.has(templateName) && !callerIsServiceRole(req)) {
+    console.warn('Blocked anon call to server-only template', { templateName })
+    return new Response(
+      JSON.stringify({ error: 'Not allowed' }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+
   // Resolve effective recipient: template-level `to` takes precedence over
   // the caller-provided recipientEmail. This allows notification templates
   // to always send to a fixed address (e.g., site owner from env var).
