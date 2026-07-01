@@ -9,6 +9,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import jsonRepair from "https://esm.sh/jsonrepair@3.11.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -194,7 +195,8 @@ Examples: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
       throw new Error(`AI gateway ${aiRes.status}: ${t}`);
     }
     const aiJson = await aiRes.json();
-    const parsed = JSON.parse(aiJson.choices?.[0]?.message?.content ?? "{}");
+    const rawContent = aiJson.choices?.[0]?.message?.content ?? "{}";
+    const parsed = JSON.parse(jsonRepair(rawContent));
 
     const imageQueries: string[] = Array.isArray(parsed.image_queries) ? parsed.image_queries : [];
 
