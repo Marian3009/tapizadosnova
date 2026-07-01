@@ -118,9 +118,9 @@ Deno.serve(async (req) => {
       console.error("BLOG_AUTOMATION_SECRET not configured");
       return jsonRes({ error: "automation_secret_missing" }, 500);
     }
-    const provided =
-      req.headers.get("x-automation-secret") ??
-      new URL(req.url).searchParams.get("secret") ?? "";
+    // Only accept the secret via header — URL query params leak into
+    // access logs, browser history, and proxy caches.
+    const provided = req.headers.get("x-automation-secret") ?? "";
     if (provided !== expected) {
       return jsonRes({ error: "unauthorized" }, 401);
     }
