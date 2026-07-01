@@ -7,6 +7,7 @@
 //
 // Auth: X-Automation-Secret header OR ?secret= URL param.
 
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -33,7 +34,7 @@ const FALLBACK_PHOTOS = [
 function slugify(s: string) {
   return s
     .toLowerCase()
-    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9\s-]/g, "")
     .trim().replace(/\s+/g, "-").slice(0, 80);
 }
@@ -69,17 +70,15 @@ async function getPhoto(query: string, index: number): Promise<{ url: string; al
   return FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length];
 }
 
-// Injects images into markdown content: one image after each H2 heading.
 async function injectImagesIntoContent(
   content: string,
   queries: string[]
 ): Promise<{ enriched: string; featuredUrl: string; featuredAlt: string }> {
   if (!queries.length) {
-    const photo = await getPhoto("tapicería sofá premium", 0);
+    const photo = await getPhoto("tapiceria sofa premium", 0);
     return { enriched: content, featuredUrl: photo.url, featuredAlt: photo.alt };
   }
 
-  // Find all H2 positions
   const h2Regex = /^## .+$/gm;
   const matches: { index: number; match: string }[] = [];
   let m;
@@ -87,20 +86,16 @@ async function injectImagesIntoContent(
     matches.push({ index: m.index, match: m[0] });
   }
 
-  // Fetch photos for each H2 section (up to queries.length)
   const photos = await Promise.all(
     queries.slice(0, Math.max(matches.length, 1)).map((q, i) => getPhoto(q, i))
   );
 
-  // Featured image is the first one
   const featured = photos[0];
 
-  // Inject images after each H2 heading
   if (!matches.length) {
     return { enriched: content, featuredUrl: featured.url, featuredAlt: featured.alt };
   }
 
-  // Build enriched content by splicing image markdown after each H2
   let result = content;
   let offset = 0;
   matches.forEach(({ index, match }, i) => {
@@ -118,7 +113,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // ---- Auth: shared secret ----
     const expected = Deno.env.get("BLOG_AUTOMATION_SECRET");
     if (!expected) {
       console.error("BLOG_AUTOMATION_SECRET not configured");
@@ -141,10 +135,9 @@ Deno.serve(async (req) => {
     let body: any = null;
     try { body = await req.json(); } catch { /* may be GET / empty */ }
     const forcedIdeaId: string | undefined = body?.idea_id;
-    const shouldPublish: boolean = body?.publish !== false; // default: publish
+    const shouldPublish: boolean = body?.publish !== false;
     const mode: "draft" | "published" = shouldPublish ? "published" : "draft";
 
-    // ---- Pick the next idea ----
     let ideaQuery = admin.from("blog_ideas").select("*").limit(1);
     if (forcedIdeaId) {
       ideaQuery = ideaQuery.eq("id", forcedIdeaId);
@@ -156,34 +149,33 @@ Deno.serve(async (req) => {
     const idea = ideas?.[0];
     if (!idea) return jsonRes({ ok: true, message: "No pending ideas" });
 
-    // ---- Generate article with AI ----
-    const system = `Eres redactor profesional para Tapizados Nova, tapicería artesanal en Rubí (Barcelona). Escribes en español, tono cercano, profesional y cálido. Devuelves JSON estricto.`;
-    const userPrompt = `Genera un artículo de blog para Tapizados Nova.
-Título base: "${idea.title}"
-Categoría: "${idea.category}"
+    const system = `Eres redactor profesional para Tapizados Nova, tapiceria artesanal en Rubi (Barcelona). Escribes en español, tono cercano, profesional y calido. Devuelves JSON estricto.`;
+    const userPrompt = `Genera un articulo de blog para Tapizados Nova.
+Titulo base: "${idea.title}"
+Categoria: "${idea.category}"
 
-Estructura el artículo (markdown en content):
-- Introducción cercana (2-3 párrafos)
-- 3 o 4 secciones con subtítulos H2
-- Consejos prácticos en listas cuando proceda
-- Mención natural a Tapizados Nova
+Estructura el articulo (markdown en content):
+- Introduccion cercana (2-3 parrafos)
+- 3 o 4 secciones con subtitulos H2
+- Consejos practicos en listas cuando proceda
+- Mencion natural a Tapizados Nova
 - CTA final invitando a pedir presupuesto en /#presupuesto o WhatsApp
 
-Devuelve SOLO JSON válido:
+Devuelve SOLO JSON valido:
 {
-  "title": "título SEO definitivo (<60 chars)",
+  "title": "titulo SEO definitivo (<60 chars)",
   "slug": "slug-amigable",
   "excerpt": "extracto breve (<160 chars)",
-  "content": "markdown completo (>=700 palabras, con H2 para cada sección)",
+  "content": "markdown completo (>=700 palabras, con H2 para cada seccion)",
   "tags": ["3 a 6 etiquetas"],
   "seo_title": "<60 chars",
   "seo_description": "<160 chars",
   "featured_image_alt": "texto alternativo descriptivo",
-  "image_queries": ["consulta en inglés para foto sección 1", "consulta sección 2", "consulta sección 3", "consulta sección 4"]
+  "image_queries": ["english query section 1", "english query section 2", "english query section 3", "english query section 4"]
 }
 
-image_queries debe contener 3-4 búsquedas cortas en inglés (2-4 palabras) para encontrar fotos de stock relevantes para cada H2 del artículo.
-Ejemplos: "upholstery fabric texture", "sofa reupholstering workshop", "luxury velvet armchair", "interior design living room".`;
+image_queries: 3-4 short English searches (2-4 words) for stock photos matching each H2 section.
+Examples: "upholstery fabric texture", "sofa reupholstering workshop", "luxury velvet armchair", "interior design living room".`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -206,7 +198,6 @@ Ejemplos: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
 
     const imageQueries: string[] = Array.isArray(parsed.image_queries) ? parsed.image_queries : [];
 
-    // ---- Inject images into content ----
     const { enriched: enrichedContent, featuredUrl, featuredAlt } =
       await injectImagesIntoContent(parsed.content || "", imageQueries);
 
@@ -239,7 +230,6 @@ Ejemplos: "upholstery fabric texture", "sofa reupholstering workshop", "luxury v
       })
       .eq("id", idea.id);
 
-    // ---- Internal notification email ----
     const postUrl = `https://tapizadosnova.es/blog/${post.slug}`;
     try {
       await admin.functions.invoke("send-transactional-email", {
