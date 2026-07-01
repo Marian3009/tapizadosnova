@@ -9,6 +9,7 @@ import Privacidad from "./pages/Privacidad.tsx";
 import AvisoLegal from "./pages/AvisoLegal.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
+import BlogConfirm from "./pages/BlogConfirm.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/confirmar" element={<BlogConfirm />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/privacidad" element={<Privacidad />} />
           <Route path="/aviso-legal" element={<AvisoLegal />} />

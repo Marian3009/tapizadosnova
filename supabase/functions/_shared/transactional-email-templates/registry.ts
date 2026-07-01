@@ -14,6 +14,7 @@ import { template as contactNotification } from './contact-notification.tsx'
 import { template as blogWeeklyPublished } from './blog-weekly-published.tsx'
 import { template as budgetNotification } from './budget-notification.tsx'
 import { template as budgetConfirmation } from './budget-confirmation.tsx'
+import { template as blogSubscribeConfirm } from './blog-subscribe-confirm.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'contact-confirmation': contactConfirmation,
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'blog-weekly-published': blogWeeklyPublished,
   'budget-notification': budgetNotification,
   'budget-confirmation': budgetConfirmation,
+  'blog-subscribe-confirm': blogSubscribeConfirm,
 }

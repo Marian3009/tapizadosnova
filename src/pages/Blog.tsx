@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { applySeo } from "@/lib/seo";
 import { SITE_URL, organizationJsonLd, ORG_ID } from "@/lib/orgSchema";
 import { BLOG_CATEGORIES } from "@/lib/blogCategories";
+import BlogSubscribe from "@/components/site/BlogSubscribe";
 
 interface PostRow {
   id: string;
@@ -161,6 +162,10 @@ export default function Blog() {
               ))}
             </div>
           )}
+
+          <div className="mt-20 max-w-2xl mx-auto">
+            <BlogSubscribe />
+          </div>
         </div>
       </main>
 
