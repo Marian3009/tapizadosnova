@@ -5,7 +5,7 @@
 // - Publishes directly (status=published, published_at=now) by default for automated runs.
 // - Sends internal notification email to tapizadosnova@gmail.com.
 //
-// Auth: X-Automation-Secret header OR ?secret= URL param.
+// Auth: X-Automation-Secret header only (query-string secret was removed to avoid log leakage).
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -118,9 +118,9 @@ Deno.serve(async (req) => {
       console.error("BLOG_AUTOMATION_SECRET not configured");
       return jsonRes({ error: "automation_secret_missing" }, 500);
     }
-    const provided =
-      req.headers.get("x-automation-secret") ??
-      new URL(req.url).searchParams.get("secret") ?? "";
+    // Only accept the secret via header — URL query params leak into
+    // access logs, browser history, and proxy caches.
+    const provided = req.headers.get("x-automation-secret") ?? "";
     if (provided !== expected) {
       return jsonRes({ error: "unauthorized" }, 401);
     }

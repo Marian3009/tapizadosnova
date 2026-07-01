@@ -32,7 +32,36 @@ function generateToken(): string {
 
 // Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
 // gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// reaches this code.
+//
+// Additionally, some templates must only ever be triggered server-to-server
+// (internal notifications, blog automations, opt-in confirmations invoked from
+// other edge functions). We reject anon-key calls for those templates below to
+// prevent abuse of the endpoint as a spam relay.
+const SERVER_ONLY_TEMPLATES = new Set<string>([
+  'blog-weekly-published',
+  'contact-notification',
+  'budget-notification',
+  'blog-subscribe-confirm',
+])
+
+function callerIsServiceRole(req: Request): boolean {
+  const auth = req.headers.get('authorization') ?? ''
+  const token = auth.toLowerCase().startsWith('bearer ')
+    ? auth.slice(7).trim()
+    : ''
+  if (!token) return false
+  const parts = token.split('.')
+  if (parts.length !== 3) return false
+  try {
+    const payload = JSON.parse(
+      atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')),
+    )
+    return payload?.role === 'service_role'
+  } catch {
+    return false
+  }
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -104,6 +133,19 @@ Deno.serve(async (req) => {
       }
     )
   }
+
+  // Reject anon-key calls attempting to trigger server-only templates.
+  if (SERVER_ONLY_TEMPLATES.has(templateName) && !callerIsServiceRole(req)) {
+    console.warn('Blocked anon call to server-only template', { templateName })
+    return new Response(
+      JSON.stringify({ error: 'Not allowed' }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
 
   // Resolve effective recipient: template-level `to` takes precedence over
   // the caller-provided recipientEmail. This allows notification templates
