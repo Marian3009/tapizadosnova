@@ -162,6 +162,10 @@ export default function Blog() {
               ))}
             </div>
           )}
+
+          <div className="mt-20 max-w-2xl mx-auto">
+            <BlogSubscribe />
+          </div>
         </div>
       </main>
 
