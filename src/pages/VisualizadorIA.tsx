@@ -190,6 +190,19 @@ export default function VisualizadorIA() {
             </Button>
           </div>
         </section>
+
+        {/* Cross-promo B2B */}
+        <section className="py-10 bg-cream border-t border-gold/20 text-center">
+          <div className="container-narrow">
+            <p className="text-muted-foreground text-sm">
+              ¿Tienes un negocio de tapicería, interiorismo o mobiliario?{" "}
+              <a href="/novatempo" className="text-gold font-medium hover:underline">
+                Descubre NovaTempo AI →
+              </a>{" "}
+              y ofrece esta misma tecnología a tus clientes con tu marca.
+            </p>
+          </div>
+        </section>
       </main>
       <Footer />
       <WhatsAppButton />

@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import VisualizadorIA from "./pages/VisualizadorIA.tsx";
+import NovaTempoLanding from "./pages/novatempo/NovaTempoLanding.tsx";
+import NovaTempoPricing from "./pages/novatempo/NovaTempoPricing.tsx";
+import NovaTempoApp from "./pages/novatempo/NovaTempoApp.tsx";
 import Admin from "./pages/Admin.tsx";
 import Privacidad from "./pages/Privacidad.tsx";
 import AvisoLegal from "./pages/AvisoLegal.tsx";
@@ -25,6 +28,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/visualizador-ia" element={<VisualizadorIA />} />
+          <Route path="/novatempo" element={<NovaTempoLanding />} />
+          <Route path="/novatempo/precios" element={<NovaTempoPricing />} />
+          <Route path="/novatempo/app" element={<NovaTempoApp />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/confirmar" element={<BlogConfirm />} />

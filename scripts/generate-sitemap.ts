@@ -17,6 +17,8 @@ interface SitemapEntry {
 const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/visualizador-ia", changefreq: "monthly", priority: "0.9" },
+  { path: "/novatempo", changefreq: "weekly", priority: "0.9" },
+  { path: "/novatempo/precios", changefreq: "monthly", priority: "0.8" },
   { path: "/blog", changefreq: "weekly", priority: "0.8" },
   { path: "/privacidad", changefreq: "yearly", priority: "0.3" },
   { path: "/aviso-legal", changefreq: "yearly", priority: "0.3" },
