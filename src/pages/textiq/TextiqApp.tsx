@@ -26,26 +26,26 @@ export default function TextiqApp() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-tq-cream textiq-scope">
       <TextiqNavbar />
-      <main className="pt-32 pb-24 bg-navy">
+      <main className="pt-32 pb-24 bg-tq-black">
         <div className="container-narrow">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <SectionHeader eyebrow="Herramienta" title="Genera tu visualización" light center={false} />
             <div className="pt-2">
               {checkingSession ? null : session ? (
-                <div className="text-right text-cream/70 text-sm">
+                <div className="text-right text-tq-sand/70 text-sm">
                   <div>{session.user.email}</div>
                   <button
                     type="button"
                     onClick={() => supabase.auth.signOut()}
-                    className="text-gold hover:underline text-xs"
+                    className="text-tq-terracotta hover:underline text-xs"
                   >
                     Cerrar sesión
                   </button>
                 </div>
               ) : (
-                <Button variant="outline-cream" size="sm" onClick={() => setAuthOpen(true)}>
+                <Button variant="outline-sand" size="sm" onClick={() => setAuthOpen(true)}>
                   Entrar / Crear cuenta
                 </Button>
               )}

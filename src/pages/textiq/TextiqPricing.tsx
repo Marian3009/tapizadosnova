@@ -86,7 +86,7 @@ export default function TextiqPricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-tq-cream textiq-scope">
       <TextiqNavbar />
       <main className="pt-32 pb-24">
         <div className="container-narrow">
@@ -100,37 +100,37 @@ export default function TextiqPricing() {
                 <div
                   key={id}
                   className={`reveal rounded-2xl p-7 border-2 flex flex-col ${
-                    plan.highlight ? "border-gold bg-navy text-cream shadow-[var(--shadow-gold)] md:-translate-y-2" : "border-cream/15 bg-white"
+                    plan.highlight ? "border-tq-terracotta bg-tq-black text-tq-sand shadow-[var(--shadow-tq)] md:-translate-y-2" : "border-tq-sand/30 bg-white"
                   }`}
                   style={{ transitionDelay: `${i * 80}ms` }}
                 >
                   {plan.highlight && (
-                    <span className="self-start mb-3 text-[11px] uppercase tracking-widest bg-gold text-navy px-3 py-1 rounded-full font-semibold">
+                    <span className="self-start mb-3 text-[11px] uppercase tracking-widest bg-tq-terracotta text-white px-3 py-1 rounded-full font-semibold">
                       Más popular
                     </span>
                   )}
-                  <h3 className={`font-display text-2xl mb-1 ${plan.highlight ? "text-cream" : "text-navy"}`}>{plan.name}</h3>
+                  <h3 className={`font-display text-2xl mb-1 ${plan.highlight ? "text-tq-sand" : "text-tq-black"}`}>{plan.name}</h3>
                   <div className="mb-4">
                     {plan.priceMonthly === null ? (
-                      <span className={`text-2xl font-display ${plan.highlight ? "text-gold" : "text-navy"}`}>A medida</span>
+                      <span className={`text-2xl font-display ${plan.highlight ? "text-tq-terracotta" : "text-tq-black"}`}>A medida</span>
                     ) : (
                       <>
-                        <span className={`text-4xl font-display ${plan.highlight ? "text-gold" : "text-navy"}`}>{plan.priceMonthly}€</span>
-                        <span className={plan.highlight ? "text-cream/60" : "text-muted-foreground"}> /mes</span>
+                        <span className={`text-4xl font-display ${plan.highlight ? "text-tq-terracotta" : "text-tq-black"}`}>{plan.priceMonthly}€</span>
+                        <span className={plan.highlight ? "text-tq-sand/60" : "text-muted-foreground"}> /mes</span>
                       </>
                     )}
                   </div>
-                  <ul className={`space-y-2 text-sm mb-6 flex-1 ${plan.highlight ? "text-cream/80" : "text-muted-foreground"}`}>
+                  <ul className={`space-y-2 text-sm mb-6 flex-1 ${plan.highlight ? "text-tq-sand/80" : "text-muted-foreground"}`}>
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <span className={plan.highlight ? "text-gold" : "text-navy"}>✓</span>
+                        <span className={plan.highlight ? "text-tq-terracotta" : "text-tq-black"}>✓</span>
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
                   <Button
-                    variant={plan.highlight ? "gold" : "outline-gold"}
-                    className={!plan.highlight ? "border-navy text-navy hover:bg-navy hover:text-cream" : ""}
+                    variant={plan.highlight ? "terracotta" : "outline-terracotta"}
+                    className={!plan.highlight ? "border-tq-black text-tq-black hover:bg-tq-black hover:text-tq-sand" : ""}
                     disabled={checkingOutPlan === id}
                     onClick={() => handleChoosePlan(id)}
                   >
@@ -151,7 +151,7 @@ export default function TextiqPricing() {
 
           <p className="text-center text-muted-foreground text-sm mt-12 max-w-xl mx-auto">
             ¿Prefieres gestionarlo a mano mientras activamos el pago con tarjeta? Escríbenos a{" "}
-            <a href={`mailto:${TEXTIQ.contactEmail}`} className="text-gold hover:underline">{TEXTIQ.contactEmail}</a>.
+            <a href={`mailto:${TEXTIQ.contactEmail}`} className="text-tq-terracotta hover:underline">{TEXTIQ.contactEmail}</a>.
           </p>
         </div>
       </main>

@@ -49,56 +49,56 @@ export default function TextiqAuthDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm bg-navy-deep border-gold/30 text-cream">
+      <DialogContent className="max-w-sm bg-tq-dark border-tq-terracotta/30 text-tq-sand">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl text-cream">
+          <DialogTitle className="font-display text-2xl text-tq-sand">
             {mode === "signup" ? `Crea tu cuenta en ${TEXTIQ.short}` : "Entra en tu cuenta"}
           </DialogTitle>
-          <p className="text-cream/60 text-sm">
+          <p className="text-tq-sand/60 text-sm">
             {mode === "signup" ? "Empieza gratis, sin tarjeta." : "Accede para ver tu plan y tu uso."}
           </p>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3 mt-2">
           {mode === "signup" && (
             <div>
-              <Label className="text-cream/80 text-xs">Nombre del negocio (opcional)</Label>
+              <Label className="text-tq-sand/80 text-xs">Nombre del negocio (opcional)</Label>
               <Input
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Ej. Tapicería García"
-                className="mt-1 bg-navy/50 border-cream/20 text-cream"
+                className="mt-1 bg-tq-black/50 border-tq-sand/20 text-tq-sand"
               />
             </div>
           )}
           <div>
-            <Label className="text-cream/80 text-xs">Email</Label>
+            <Label className="text-tq-sand/80 text-xs">Email</Label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
-              className="mt-1 bg-navy/50 border-cream/20 text-cream"
+              className="mt-1 bg-tq-black/50 border-tq-sand/20 text-tq-sand"
             />
           </div>
           <div>
-            <Label className="text-cream/80 text-xs">Contraseña</Label>
+            <Label className="text-tq-sand/80 text-xs">Contraseña</Label>
             <Input
               type="password"
               value={pwd}
               onChange={(e) => setPwd(e.target.value)}
               required
               minLength={8}
-              className="mt-1 bg-navy/50 border-cream/20 text-cream"
+              className="mt-1 bg-tq-black/50 border-tq-sand/20 text-tq-sand"
             />
           </div>
-          <Button type="submit" variant="gold" className="w-full" disabled={busy}>
+          <Button type="submit" variant="terracotta" className="w-full" disabled={busy}>
             {busy ? "..." : mode === "signup" ? "Crear cuenta gratis" : "Entrar"}
           </Button>
           <button
             type="button"
             onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-            className="text-xs text-cream/60 hover:text-gold w-full text-center"
+            className="text-xs text-tq-sand/60 hover:text-tq-terracotta w-full text-center"
           >
             {mode === "signup" ? "¿Ya tienes cuenta? Entra" : "¿No tienes cuenta? Crea una gratis"}
           </button>

@@ -10,10 +10,10 @@ import type { TextiqUsage } from "@/hooks/use-textiq-session";
 import { TEXTIQ } from "@/lib/textiq/brand";
 
 const PROCESSING_STEPS = [
-  { label: "🔍 Analizando la imagen con IA...", pct: 22 },
-  { label: "🎨 Componiendo la propuesta...", pct: 50 },
-  { label: "🧵 Ajustando texturas y materiales...", pct: 75 },
-  { label: "✨ Finalizando la visualización...", pct: 92 },
+  { label: "Analizando la imagen con IA...", pct: 22 },
+  { label: "Componiendo la propuesta...", pct: 50 },
+  { label: "Ajustando texturas y materiales...", pct: 75 },
+  { label: "Finalizando la visualización...", pct: 92 },
 ];
 
 interface Props {
@@ -167,41 +167,41 @@ export default function TextiqVisualizer({
     <div className="max-w-4xl mx-auto">
       {/* Contador de uso */}
       {!usageLoading && usage && (
-        <div className="mb-8 rounded-xl border border-gold/20 bg-navy-deep/60 px-5 py-4">
-          <div className="flex items-center justify-between text-sm text-cream/80 mb-2">
+        <div className="mb-8 rounded-xl border border-tq-terracotta/20 bg-tq-dark/60 px-5 py-4">
+          <div className="flex items-center justify-between text-sm text-tq-sand/80 mb-2">
             <span>
-              Plan <strong className="text-gold capitalize">{usage.plan}</strong> · {usage.used} / {usage.limit} generaciones este mes
+              Plan <strong className="text-tq-terracotta capitalize">{usage.plan}</strong> · {usage.used} / {usage.limit} generaciones este mes
             </span>
             {!isLoggedIn && (
-              <button type="button" onClick={onRequireAuth} className="text-gold hover:underline text-xs">
+              <button type="button" onClick={onRequireAuth} className="text-tq-terracotta hover:underline text-xs">
                 Crear cuenta gratis →
               </button>
             )}
           </div>
-          <Progress value={usagePct} className="h-1.5 bg-cream/10 [&>div]:bg-gold" />
+          <Progress value={usagePct} className="h-1.5 bg-tq-sand/10 [&>div]:bg-tq-terracotta" />
         </div>
       )}
 
       {result && itemImage ? (
         <div className="animate-fade-in">
           <div className="text-center mb-6">
-            <h3 className="font-display text-3xl md:text-4xl text-cream">✨ Tu propuesta con IA</h3>
+            <h3 className="font-display text-3xl md:text-4xl text-tq-sand">Tu propuesta con IA</h3>
           </div>
-          <div className="max-w-2xl mx-auto rounded-2xl overflow-hidden border-[3px] border-gold shadow-[0_30px_60px_-20px_rgba(42,48,60,0.7)]">
+          <div className="max-w-2xl mx-auto rounded-2xl overflow-hidden border-[3px] border-tq-terracotta shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
             <BeforeAfterSlider before={itemImage.dataUrl} after={result} />
           </div>
-          <p className="text-center text-cream/50 text-xs mt-3">Arrastra el control para comparar el antes y el después</p>
+          <p className="text-center text-tq-sand/50 text-xs mt-3">Arrastra el control para comparar el antes y el después</p>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            <Button variant="gold" size="lg" onClick={download}>📥 Descargar imagen</Button>
-            <Button variant="outline-gold" size="lg" onClick={reset}>🔄 Nueva generación</Button>
+            <Button variant="terracotta" size="lg" onClick={download}>Descargar imagen</Button>
+            <Button variant="outline-terracotta" size="lg" onClick={reset}>Nueva generación</Button>
           </div>
         </div>
       ) : processing ? (
-        <div className="rounded-2xl border border-gold/30 bg-navy-deep/60 p-10 md:p-14 text-center animate-fade-in max-w-2xl mx-auto">
-          <div className="inline-block w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin mb-6" />
-          <p className="text-cream text-lg md:text-xl font-medium mb-2">{PROCESSING_STEPS[stepIdx].label}</p>
-          <p className="text-cream/50 text-sm mb-6">Paso {stepIdx + 1} de {PROCESSING_STEPS.length} · 10-30 segundos</p>
-          <Progress value={PROCESSING_STEPS[stepIdx].pct} className="h-2 bg-cream/10 [&>div]:bg-gold" />
+        <div className="rounded-2xl border border-tq-terracotta/30 bg-tq-dark/60 p-10 md:p-14 text-center animate-fade-in max-w-2xl mx-auto">
+          <div className="inline-block w-12 h-12 border-4 border-tq-terracotta border-t-transparent rounded-full animate-spin mb-6" />
+          <p className="text-tq-sand text-lg md:text-xl font-medium mb-2">{PROCESSING_STEPS[stepIdx].label}</p>
+          <p className="text-tq-sand/50 text-sm mb-6">Paso {stepIdx + 1} de {PROCESSING_STEPS.length} · 10-30 segundos</p>
+          <Progress value={PROCESSING_STEPS[stepIdx].pct} className="h-2 bg-tq-sand/10 [&>div]:bg-tq-terracotta" />
         </div>
       ) : (
         <>
@@ -251,13 +251,13 @@ export default function TextiqVisualizer({
           {/* Imágenes */}
           <div className="grid md:grid-cols-2 gap-5 mt-6">
             <UploadZone
-              title={mode === "retapizar" ? "📷 1. Sube la foto del elemento" : "📷 1. Sube la foto del espacio"}
+              title={mode === "retapizar" ? "1. Sube la foto del elemento" : "1. Sube la foto del espacio"}
               value={itemImage?.dataUrl ?? null}
               onFile={handleItemFile}
               onClear={() => setItemImage(null)}
             />
             <UploadZone
-              title={mode === "retapizar" ? "🧵 2. Foto del tejido o material" : "🖼️ 2. Inspiración (opcional)"}
+              title={mode === "retapizar" ? "2. Foto del tejido o material" : "2. Inspiración (opcional)"}
               value={referenceImage?.dataUrl ?? null}
               onFile={handleReferenceFile}
               onClear={() => setReferenceImage(null)}
@@ -266,17 +266,17 @@ export default function TextiqVisualizer({
           </div>
 
           {(error || limitError) && (
-            <div className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 text-cream px-4 py-4 text-sm">
+            <div className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 text-tq-sand px-4 py-4 text-sm">
               {limitError ? (
                 <>
                   <p className="font-medium mb-1">Has alcanzado el límite de tu plan {usage?.plan ?? "gratuito"} este mes.</p>
-                  <p className="text-cream/70 mb-3">Actualiza de plan para seguir generando visualizaciones sin esperar al mes que viene.</p>
+                  <p className="text-tq-sand/70 mb-3">Actualiza de plan para seguir generando visualizaciones sin esperar al mes que viene.</p>
                   <div className="flex flex-wrap gap-2">
-                    <Button asChild size="sm" variant="gold">
+                    <Button asChild size="sm" variant="terracotta">
                       <a href={TEXTIQ.routes.pricing}>Ver planes</a>
                     </Button>
                     {!isLoggedIn && (
-                      <Button size="sm" variant="outline-gold" onClick={onRequireAuth}>Crear cuenta</Button>
+                      <Button size="sm" variant="outline-terracotta" onClick={onRequireAuth}>Crear cuenta</Button>
                     )}
                   </div>
                 </>
@@ -284,7 +284,7 @@ export default function TextiqVisualizer({
                 <>
                   {error}
                   <div className="mt-2">
-                    <Button size="sm" variant="gold" onClick={generate} disabled={!canGenerate}>Reintentar</Button>
+                    <Button size="sm" variant="terracotta" onClick={generate} disabled={!canGenerate}>Reintentar</Button>
                   </div>
                 </>
               )}
@@ -293,8 +293,8 @@ export default function TextiqVisualizer({
 
           {canGenerate && !limitError && (
             <div className="flex justify-center mt-6">
-              <Button variant="gold" size="xl" onClick={generate} className="px-12">
-                ✨ Generar con IA
+              <Button variant="terracotta" size="xl" onClick={generate} className="px-12">
+                Generar con IA
               </Button>
             </div>
           )}
@@ -310,12 +310,12 @@ function ModeCard({ active, icon, title, desc, onClick }: { active: boolean; ico
       type="button"
       onClick={onClick}
       className={`text-left rounded-xl border-2 p-5 transition ${
-        active ? "border-gold bg-gold/10" : "border-cream/15 bg-cream/5 hover:border-gold/50"
+        active ? "border-tq-terracotta bg-tq-terracotta/10" : "border-tq-sand/15 bg-tq-sand/5 hover:border-tq-terracotta/50"
       }`}
     >
       <div className="text-2xl mb-2">{icon}</div>
-      <div className="font-display text-lg text-cream">{title}</div>
-      <div className="text-cream/60 text-sm mt-1">{desc}</div>
+      <div className="font-display text-lg text-tq-sand">{title}</div>
+      <div className="text-tq-sand/60 text-sm mt-1">{desc}</div>
     </button>
   );
 }
@@ -325,7 +325,7 @@ function ChipGroup({
 }: { label: string; options: { id: string; label: string }[]; value: string; onChange: (v: string) => void }) {
   return (
     <div className="mt-5">
-      <p className="text-cream/70 text-xs uppercase tracking-widest mb-2">{label}</p>
+      <p className="text-tq-sand/70 text-xs uppercase tracking-widest mb-2">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <button
@@ -334,8 +334,8 @@ function ChipGroup({
             onClick={() => onChange(o.id)}
             className={`px-3.5 py-2 rounded-full text-sm transition border ${
               value === o.id
-                ? "bg-gold text-navy font-medium border-gold"
-                : "bg-cream/5 text-cream/80 border-cream/15 hover:border-gold/60 hover:text-gold"
+                ? "bg-tq-terracotta text-white font-medium border-tq-terracotta"
+                : "bg-tq-sand/5 text-tq-sand/80 border-tq-sand/15 hover:border-tq-terracotta/60 hover:text-tq-terracotta"
             }`}
           >
             {o.label}
@@ -351,9 +351,9 @@ function UploadZone({
 }: { title: string; value: string | null; onFile: (f: File) => void; onClear: () => void; optional?: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className="rounded-xl border-2 border-dashed border-gold/40 bg-cream/5 p-5">
-      <h4 className="text-cream font-medium mb-3">
-        {title} {optional && <span className="text-cream/40 text-xs font-normal">(opcional)</span>}
+    <div className="rounded-xl border-2 border-dashed border-tq-terracotta/40 bg-tq-sand/5 p-5">
+      <h4 className="text-tq-sand font-medium mb-3">
+        {title} {optional && <span className="text-tq-sand/40 text-xs font-normal">(opcional)</span>}
       </h4>
       {value ? (
         <div className="relative">
@@ -361,7 +361,7 @@ function UploadZone({
           <button
             type="button"
             onClick={onClear}
-            className="absolute top-2 right-2 bg-navy/80 text-cream w-8 h-8 rounded-full hover:bg-destructive transition"
+            className="absolute top-2 right-2 bg-tq-black/80 text-tq-sand w-8 h-8 rounded-full hover:bg-destructive transition"
             aria-label="Eliminar"
           >×</button>
         </div>
@@ -369,7 +369,7 @@ function UploadZone({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full h-36 rounded-lg bg-cream/5 border border-gold/20 hover:bg-cream/10 transition flex flex-col items-center justify-center text-cream/70"
+          className="w-full h-36 rounded-lg bg-tq-sand/5 border border-tq-terracotta/20 hover:bg-tq-sand/10 transition flex flex-col items-center justify-center text-tq-sand/70"
         >
           <span className="text-3xl mb-1">＋</span>
           <span className="text-sm">Formato JPG/PNG · máx 20 MB</span>
