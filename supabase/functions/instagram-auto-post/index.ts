@@ -357,7 +357,7 @@ Deno.serve(async (req) => {
     if (!apiKey) return jsonRes({ error: "LOVABLE_API_KEY missing" }, 500);
 
     const accessToken = Deno.env.get("INSTAGRAM_ACCESS_TOKEN");
-    const accountId = Deno.env.get("INSTAGRAM_ACCOUNT_ID");
+    const accountId = Deno.env.get("INSTAGRAM_ACCOUNT_ID") ?? "17841410021395077";
 
     const supaUrl = Deno.env.get("SUPABASE_URL")!;
     const supaSrv = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
