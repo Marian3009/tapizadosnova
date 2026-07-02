@@ -3,16 +3,16 @@ project_id = "kmiaethuwbmivsoeqxpo"
 [functions.analyze-furniture]
 verify_jwt = false
 
-[functions.novatempo-generate]
+[functions.textiq-generate]
 verify_jwt = false
 
-[functions.novatempo-usage]
+[functions.textiq-usage]
 verify_jwt = false
 
-[functions.novatempo-create-checkout]
+[functions.textiq-create-checkout]
 verify_jwt = false
 
-[functions.novatempo-stripe-webhook]
+[functions.textiq-stripe-webhook]
 verify_jwt = false
 
 [functions.process-email-queue]

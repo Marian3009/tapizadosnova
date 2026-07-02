@@ -1,4 +1,4 @@
-// NovaTempo AI — webhook de Stripe. Mantiene novatempo_subscribers al día
+// Textiq AI — webhook de Stripe. Mantiene textiq_subscribers al día
 // con el plan y estado reales de cada suscripción. Requiere STRIPE_SECRET_KEY
 // y STRIPE_WEBHOOK_SECRET configurados; si faltan, responde 501 sin tocar datos.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
         const userId = session.metadata?.supabase_user_id;
         const plan = session.metadata?.plan;
         if (userId && plan && session.customer) {
-          await admin.from("novatempo_subscribers").upsert({
+          await admin.from("textiq_subscribers").upsert({
             user_id: userId,
             email: session.customer_details?.email ?? "",
             plan,
@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
         const plan = resolvePlanFromPriceId(priceId) ?? subscription.metadata?.plan ?? "free";
         const status = subscription.status === "active" || subscription.status === "trialing" ? "active" : "past_due";
         if (userId) {
-          await admin.from("novatempo_subscribers").update({
+          await admin.from("textiq_subscribers").update({
             plan,
             status,
             stripe_subscription_id: subscription.id,
@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.supabase_user_id;
         if (userId) {
-          await admin.from("novatempo_subscribers").update({
+          await admin.from("textiq_subscribers").update({
             plan: "free",
             status: "canceled",
           }).eq("user_id", userId);
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
         break;
     }
   } catch (e) {
-    console.error("novatempo-stripe-webhook handling error", e);
+    console.error("textiq-stripe-webhook handling error", e);
     return new Response(JSON.stringify({ error: "internal_error" }), { status: 500 });
   }
 

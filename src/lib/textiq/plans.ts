@@ -11,7 +11,7 @@ export interface PlanDef {
 }
 
 // Mantener sincronizado con PLAN_LIMITS en las edge functions
-// novatempo-generate y novatempo-usage.
+// textiq-generate y textiq-usage.
 export const PLANS: Record<PlanId, PlanDef> = {
   free: {
     id: "free",
@@ -23,7 +23,7 @@ export const PLANS: Record<PlanId, PlanDef> = {
       "5 generaciones IA al mes",
       "Modo retapizar mueble",
       "Modo proponer decoración",
-      "Marca de agua NovaTempo",
+      "Marca de agua Textiq",
     ],
   },
   pro: {

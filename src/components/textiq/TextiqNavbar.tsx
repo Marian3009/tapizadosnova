@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
+import { TEXTIQ } from "@/lib/textiq/brand";
 
 const links = [
-  { href: NOVATEMPO.routes.landing, label: "Inicio" },
-  { href: `${NOVATEMPO.routes.landing}#categorias`, label: "Qué genera" },
-  { href: NOVATEMPO.routes.pricing, label: "Precios" },
+  { href: TEXTIQ.routes.landing, label: "Inicio" },
+  { href: `${TEXTIQ.routes.landing}#categorias`, label: "Qué genera" },
+  { href: TEXTIQ.routes.pricing, label: "Precios" },
 ];
 
-export default function NovaTempoNavbar() {
+export default function TextiqNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-navy shadow-lg py-4">
       <div className="container-narrow flex items-center justify-between">
-        <a href={NOVATEMPO.routes.landing} className="font-display text-2xl md:text-3xl text-gold tracking-wide">
-          {NOVATEMPO.short} <span className="italic font-normal text-cream">AI</span>
+        <a href={TEXTIQ.routes.landing} className="font-display text-2xl md:text-3xl text-gold tracking-wide">
+          {TEXTIQ.short} <span className="italic font-normal text-cream">AI</span>
         </a>
 
         <nav className="hidden lg:flex items-center gap-7">
@@ -26,7 +26,7 @@ export default function NovaTempoNavbar() {
             </a>
           ))}
           <Button asChild variant="gold" size="sm">
-            <a href={NOVATEMPO.routes.app}>Probar la app</a>
+            <a href={TEXTIQ.routes.app}>Probar la app</a>
           </Button>
         </nav>
 
@@ -49,7 +49,7 @@ export default function NovaTempoNavbar() {
               </a>
             ))}
             <Button asChild variant="gold" className="mt-2">
-              <a href={NOVATEMPO.routes.app} onClick={() => setOpen(false)}>Probar la app</a>
+              <a href={TEXTIQ.routes.app} onClick={() => setOpen(false)}>Probar la app</a>
             </Button>
           </div>
         </div>

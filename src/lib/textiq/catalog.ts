@@ -1,5 +1,5 @@
 // Mantener las claves sincronizadas con CATEGORY_LABELS / SPACE_LABELS /
-// STYLE_LABELS en supabase/functions/novatempo-generate/index.ts.
+// STYLE_LABELS en supabase/functions/textiq-generate/index.ts.
 export type Mode = "retapizar" | "proponer";
 
 export interface CategoryDef {

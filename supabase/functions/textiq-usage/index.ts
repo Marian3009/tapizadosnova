@@ -1,4 +1,4 @@
-// NovaTempo AI — devuelve el consumo del mes en curso y el plan activo,
+// Textiq AI — devuelve el consumo del mes en curso y el plan activo,
 // para pintar el contador de uso y el paywall en el cliente.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     let businessName: string | null = null;
     if (userId) {
       const { data: sub } = await admin
-        .from("novatempo_subscribers")
+        .from("textiq_subscribers")
         .select("plan, status, business_name")
         .eq("user_id", userId)
         .maybeSingle();
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     const limit = PLAN_LIMITS[plan] ?? PLAN_LIMITS.free;
 
     let usageQuery = admin
-      .from("novatempo_usage")
+      .from("textiq_usage")
       .select("id", { count: "exact", head: true })
       .gte("created_at", monthStartIso());
     usageQuery = userId ? usageQuery.eq("user_id", userId) : usageQuery.eq("device_id", String(deviceId));
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("novatempo-usage error", e);
+    console.error("textiq-usage error", e);
     return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

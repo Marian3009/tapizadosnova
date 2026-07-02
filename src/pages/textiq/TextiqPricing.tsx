@@ -1,40 +1,40 @@
 import { useEffect, useState } from "react";
-import NovaTempoNavbar from "@/components/novatempo/NovaTempoNavbar";
-import NovaTempoFooter from "@/components/novatempo/NovaTempoFooter";
-import NovaTempoAuthDialog from "@/components/novatempo/NovaTempoAuthDialog";
+import TextiqNavbar from "@/components/textiq/TextiqNavbar";
+import TextiqFooter from "@/components/textiq/TextiqFooter";
+import TextiqAuthDialog from "@/components/textiq/TextiqAuthDialog";
 import SectionHeader from "@/components/site/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { useReveal } from "@/hooks/use-reveal";
 import { applySeo } from "@/lib/seo";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
-import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/novatempo/plans";
-import { useNovaTempoSession } from "@/hooks/use-novatempo-session";
+import { TEXTIQ } from "@/lib/textiq/brand";
+import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/textiq/plans";
+import { useTextiqSession } from "@/hooks/use-textiq-session";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-export default function NovaTempoPricing() {
+export default function TextiqPricing() {
   useReveal();
-  const { session, usage, refreshUsage } = useNovaTempoSession();
+  const { session, usage, refreshUsage } = useTextiqSession();
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingPlan, setPendingPlan] = useState<PlanId | null>(null);
   const [checkingOutPlan, setCheckingOutPlan] = useState<PlanId | null>(null);
 
   useEffect(() => {
     applySeo({
-      title: `Precios | ${NOVATEMPO.name}`,
-      description: `Planes de ${NOVATEMPO.name} para tapicerías, estudios de interiorismo y particulares. Empieza gratis.`,
-      path: NOVATEMPO.routes.pricing,
+      title: `Precios | ${TEXTIQ.name}`,
+      description: `Planes de ${TEXTIQ.name} para tapicerías, estudios de interiorismo y particulares. Empieza gratis.`,
+      path: TEXTIQ.routes.pricing,
     });
   }, []);
 
   const startCheckout = async (plan: PlanId) => {
     setCheckingOutPlan(plan);
     try {
-      const { data, error } = await supabase.functions.invoke("novatempo-create-checkout", {
+      const { data, error } = await supabase.functions.invoke("textiq-create-checkout", {
         body: {
           plan,
-          successUrl: `${window.location.origin}${NOVATEMPO.routes.pricing}?checkout=success`,
-          cancelUrl: `${window.location.origin}${NOVATEMPO.routes.pricing}?checkout=cancel`,
+          successUrl: `${window.location.origin}${TEXTIQ.routes.pricing}?checkout=success`,
+          cancelUrl: `${window.location.origin}${TEXTIQ.routes.pricing}?checkout=cancel`,
         },
       });
       if (error) throw error;
@@ -70,11 +70,11 @@ export default function NovaTempoPricing() {
 
   const handleChoosePlan = (plan: PlanId) => {
     if (plan === "free") {
-      window.location.href = NOVATEMPO.routes.app;
+      window.location.href = TEXTIQ.routes.app;
       return;
     }
     if (plan === "agency") {
-      window.location.href = `mailto:${NOVATEMPO.contactEmail}?subject=NovaTempo%20AI%20-%20Plan%20Agencia`;
+      window.location.href = `mailto:${TEXTIQ.contactEmail}?subject=Textiq%20AI%20-%20Plan%20Agencia`;
       return;
     }
     if (!session) {
@@ -87,7 +87,7 @@ export default function NovaTempoPricing() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NovaTempoNavbar />
+      <TextiqNavbar />
       <main className="pt-32 pb-24">
         <div className="container-narrow">
           <SectionHeader eyebrow="Precios" title="Un plan para cada tamaño de negocio" subtitle="Sin permanencia. Cambia o cancela cuando quieras." />
@@ -151,12 +151,12 @@ export default function NovaTempoPricing() {
 
           <p className="text-center text-muted-foreground text-sm mt-12 max-w-xl mx-auto">
             ¿Prefieres gestionarlo a mano mientras activamos el pago con tarjeta? Escríbenos a{" "}
-            <a href={`mailto:${NOVATEMPO.contactEmail}`} className="text-gold hover:underline">{NOVATEMPO.contactEmail}</a>.
+            <a href={`mailto:${TEXTIQ.contactEmail}`} className="text-gold hover:underline">{TEXTIQ.contactEmail}</a>.
           </p>
         </div>
       </main>
-      <NovaTempoFooter />
-      <NovaTempoAuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+      <TextiqFooter />
+      <TextiqAuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 }

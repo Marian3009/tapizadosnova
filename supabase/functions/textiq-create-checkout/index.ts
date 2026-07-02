@@ -1,4 +1,4 @@
-// NovaTempo AI — crea una sesión de Stripe Checkout para pasar a un plan
+// Textiq AI — crea una sesión de Stripe Checkout para pasar a un plan
 // de pago. No hace nada mágico: necesita STRIPE_SECRET_KEY y los price ID
 // de cada plan configurados como secretos en el proyecto de Supabase.
 // Hasta que esas variables existan, responde 501 "not_configured" y el
@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     });
 
     const { data: sub } = await admin
-      .from("novatempo_subscribers")
+      .from("textiq_subscribers")
       .select("stripe_customer_id")
       .eq("user_id", user.id)
       .maybeSingle();
@@ -89,8 +89,8 @@ Deno.serve(async (req) => {
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: successUrl || "https://tapizadosnova.es/novatempo/precios?checkout=success",
-      cancel_url: cancelUrl || "https://tapizadosnova.es/novatempo/precios?checkout=cancel",
+      success_url: successUrl || "https://tapizadosnova.es/textiq/precios?checkout=success",
+      cancel_url: cancelUrl || "https://tapizadosnova.es/textiq/precios?checkout=cancel",
       metadata: { supabase_user_id: user.id, plan },
       subscription_data: { metadata: { supabase_user_id: user.id, plan } },
     });
@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("novatempo-create-checkout error", e);
+    console.error("textiq-create-checkout error", e);
     return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

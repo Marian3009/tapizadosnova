@@ -46,7 +46,7 @@ export function dataUrlToBase64(d: string) {
 }
 
 // Marca de agua discreta para resultados generados en el plan Gratis.
-export async function applyWatermark(dataUrl: string, label = "NovaTempo AI"): Promise<string> {
+export async function applyWatermark(dataUrl: string, label = "Textiq AI"): Promise<string> {
   try {
     const img = new Image();
     await new Promise<void>((resolve, reject) => {

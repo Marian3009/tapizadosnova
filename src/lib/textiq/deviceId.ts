@@ -1,4 +1,4 @@
-const STORAGE_KEY = "novatempo_device_id";
+const STORAGE_KEY = "textiq_device_id";
 
 // Identificador anónimo persistente en este navegador, usado para aplicar
 // el límite del plan Gratis a usuarios que todavía no se han registrado.

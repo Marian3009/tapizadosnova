@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import NovaTempoNavbar from "@/components/novatempo/NovaTempoNavbar";
-import NovaTempoFooter from "@/components/novatempo/NovaTempoFooter";
+import TextiqNavbar from "@/components/textiq/TextiqNavbar";
+import TextiqFooter from "@/components/textiq/TextiqFooter";
 import SectionHeader from "@/components/site/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { useReveal } from "@/hooks/use-reveal";
 import { applySeo } from "@/lib/seo";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
-import { CATEGORIES, SPACES } from "@/lib/novatempo/catalog";
+import { TEXTIQ } from "@/lib/textiq/brand";
+import { CATEGORIES, SPACES } from "@/lib/textiq/catalog";
 import heroImg from "@/assets/hero-sofa.jpg";
 
 const AUDIENCES = [
@@ -16,22 +16,22 @@ const AUDIENCES = [
   { icon: "✨", title: "Particulares", text: "¿Reformas tu casa? Visualiza cortinas, sofás o el jardín antes de gastar un euro." },
 ];
 
-export default function NovaTempoLanding() {
+export default function TextiqLanding() {
   useReveal();
 
   useEffect(() => {
     applySeo({
-      title: `${NOVATEMPO.name} — Decoración textil e interiorismo con IA`,
-      description: NOVATEMPO.claim,
-      path: NOVATEMPO.routes.landing,
+      title: `${TEXTIQ.name} — Decoración textil e interiorismo con IA`,
+      description: TEXTIQ.claim,
+      path: TEXTIQ.routes.landing,
       image: "/logo.png",
-      imageAlt: NOVATEMPO.name,
+      imageAlt: TEXTIQ.name,
     });
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
-      <NovaTempoNavbar />
+      <TextiqNavbar />
       <main>
         {/* Hero */}
         <section className="relative pt-36 pb-24 md:pt-48 md:pb-32 overflow-hidden bg-navy-deep">
@@ -49,15 +49,15 @@ export default function NovaTempoLanding() {
               La IA que <span className="italic text-gold">visualiza</span> cualquier espacio o mueble en segundos
             </h1>
             <p className="text-lg md:text-xl text-cream/75 max-w-2xl mx-auto mb-10 leading-relaxed opacity-0 animate-fade-in" style={{ animationDelay: "0.45s" }}>
-              Sofás, cortinas, cabeceros, camas, terrazas y jardines. Sube una foto y {NOVATEMPO.short} genera el resultado
+              Sofás, cortinas, cabeceros, camas, terrazas y jardines. Sube una foto y {TEXTIQ.short} genera el resultado
               retapizado o una propuesta de decoración en tendencia, lista para enseñar al cliente.
             </p>
             <div className="flex flex-wrap gap-4 justify-center opacity-0 animate-fade-in" style={{ animationDelay: "0.6s" }}>
               <Button asChild variant="gold" size="xl">
-                <a href={NOVATEMPO.routes.app}>✨ Probar gratis</a>
+                <a href={TEXTIQ.routes.app}>✨ Probar gratis</a>
               </Button>
               <Button asChild variant="outline-cream" size="xl">
-                <a href={NOVATEMPO.routes.pricing}>Ver planes y precios</a>
+                <a href={TEXTIQ.routes.pricing}>Ver planes y precios</a>
               </Button>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function NovaTempoLanding() {
                 <div className="text-3xl mb-3">🪑</div>
                 <h3 className="font-display text-2xl text-navy mb-2">Retapizar un elemento</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  El cliente tiene un mueble, cortina o cabecero y una tela candidata. Subís las dos fotos y {NOVATEMPO.short}
+                  El cliente tiene un mueble, cortina o cabecero y una tela candidata. Subís las dos fotos y {TEXTIQ.short}
                   {" "}genera el resultado realista al instante.
                 </p>
               </div>
@@ -133,12 +133,12 @@ export default function NovaTempoLanding() {
             <h2 className="font-display text-3xl md:text-4xl text-cream mb-4">Empieza gratis, sin tarjeta</h2>
             <p className="text-cream/70 max-w-xl mx-auto mb-8">5 generaciones al mes incluidas. Amplía cuando lo necesites.</p>
             <Button asChild variant="gold" size="xl">
-              <a href={NOVATEMPO.routes.app}>Crear mi cuenta gratis</a>
+              <a href={TEXTIQ.routes.app}>Crear mi cuenta gratis</a>
             </Button>
           </div>
         </section>
       </main>
-      <NovaTempoFooter />
+      <TextiqFooter />
     </div>
   );
 }

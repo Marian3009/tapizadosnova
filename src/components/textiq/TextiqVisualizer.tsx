@@ -4,10 +4,10 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import BeforeAfterSlider from "@/components/site/BeforeAfterSlider";
-import { CATEGORIES, SPACES, STYLES, categoriesForMode, type Mode } from "@/lib/novatempo/catalog";
-import { resizeImageToJpegDataUrl, dataUrlToBase64, applyWatermark } from "@/lib/novatempo/imageUtils";
-import type { NovaTempoUsage } from "@/hooks/use-novatempo-session";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
+import { CATEGORIES, SPACES, STYLES, categoriesForMode, type Mode } from "@/lib/textiq/catalog";
+import { resizeImageToJpegDataUrl, dataUrlToBase64, applyWatermark } from "@/lib/textiq/imageUtils";
+import type { TextiqUsage } from "@/hooks/use-textiq-session";
+import { TEXTIQ } from "@/lib/textiq/brand";
 
 const PROCESSING_STEPS = [
   { label: "🔍 Analizando la imagen con IA...", pct: 22 },
@@ -19,13 +19,13 @@ const PROCESSING_STEPS = [
 interface Props {
   deviceId: string;
   isLoggedIn: boolean;
-  usage: NovaTempoUsage | null;
+  usage: TextiqUsage | null;
   usageLoading: boolean;
   onUsageChange: () => void;
   onRequireAuth: () => void;
 }
 
-export default function NovaTempoVisualizer({
+export default function TextiqVisualizer({
   deviceId,
   isLoggedIn,
   usage,
@@ -112,7 +112,7 @@ export default function NovaTempoVisualizer({
     setLimitError(false);
     setResult(null);
     try {
-      const { data, error: fnErr } = await supabase.functions.invoke("novatempo-generate", {
+      const { data, error: fnErr } = await supabase.functions.invoke("textiq-generate", {
         body: {
           mode,
           category,
@@ -142,7 +142,7 @@ export default function NovaTempoVisualizer({
       if (!data?.imageUrl) throw new Error(data?.error || "no_image");
 
       const finalPlan = data?.usage?.plan ?? usage?.plan ?? "free";
-      const finalImage = finalPlan === "free" ? await applyWatermark(data.imageUrl, NOVATEMPO.short) : data.imageUrl;
+      const finalImage = finalPlan === "free" ? await applyWatermark(data.imageUrl, TEXTIQ.short) : data.imageUrl;
       setResult(finalImage);
       onUsageChange();
     } catch (e) {
@@ -157,7 +157,7 @@ export default function NovaTempoVisualizer({
     if (!result) return;
     const a = document.createElement("a");
     a.href = result;
-    a.download = "novatempo-ai.jpg";
+    a.download = "textiq-ai.jpg";
     a.click();
   };
 
@@ -273,7 +273,7 @@ export default function NovaTempoVisualizer({
                   <p className="text-cream/70 mb-3">Actualiza de plan para seguir generando visualizaciones sin esperar al mes que viene.</p>
                   <div className="flex flex-wrap gap-2">
                     <Button asChild size="sm" variant="gold">
-                      <a href={NOVATEMPO.routes.pricing}>Ver planes</a>
+                      <a href={TEXTIQ.routes.pricing}>Ver planes</a>
                     </Button>
                     {!isLoggedIn && (
                       <Button size="sm" variant="outline-gold" onClick={onRequireAuth}>Crear cuenta</Button>

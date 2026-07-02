@@ -1,4 +1,4 @@
-// NovaTempo AI — motor de generación multi-categoría / multi-espacio.
+// Textiq AI — motor de generación multi-categoría / multi-espacio.
 // Reutiliza el mismo gateway de IA de imagen (Gemini 2.5 Flash Image) que
 // analyze-furniture, pero añade: categorías más allá de tapicería de
 // muebles (cortinas, cabeceros, camas, exterior/chill-out), un modo para
@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
     let plan = "free";
     if (userId) {
       const { data: sub } = await admin
-        .from("novatempo_subscribers")
+        .from("textiq_subscribers")
         .select("plan, status")
         .eq("user_id", userId)
         .maybeSingle();
@@ -214,7 +214,7 @@ Deno.serve(async (req) => {
 
     // --- Comprobar consumo del mes en curso ---
     let usageQuery = admin
-      .from("novatempo_usage")
+      .from("textiq_usage")
       .select("id", { count: "exact", head: true })
       .gte("created_at", monthStartIso());
     usageQuery = userId ? usageQuery.eq("user_id", userId) : usageQuery.eq("device_id", String(deviceId));
@@ -304,7 +304,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { error: insertErr } = await admin.from("novatempo_usage").insert({
+    const { error: insertErr } = await admin.from("textiq_usage").insert({
       user_id: userId,
       device_id: userId ? null : String(deviceId),
       mode,
@@ -317,7 +317,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("novatempo-generate error", e);
+    console.error("textiq-generate error", e);
     return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

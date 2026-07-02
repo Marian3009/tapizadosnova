@@ -1,33 +1,33 @@
 import { useEffect, useState } from "react";
-import NovaTempoNavbar from "@/components/novatempo/NovaTempoNavbar";
-import NovaTempoFooter from "@/components/novatempo/NovaTempoFooter";
-import NovaTempoAuthDialog from "@/components/novatempo/NovaTempoAuthDialog";
-import NovaTempoVisualizer from "@/components/novatempo/NovaTempoVisualizer";
+import TextiqNavbar from "@/components/textiq/TextiqNavbar";
+import TextiqFooter from "@/components/textiq/TextiqFooter";
+import TextiqAuthDialog from "@/components/textiq/TextiqAuthDialog";
+import TextiqVisualizer from "@/components/textiq/TextiqVisualizer";
 import SectionHeader from "@/components/site/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { useReveal } from "@/hooks/use-reveal";
 import { applySeo } from "@/lib/seo";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
-import { useNovaTempoSession } from "@/hooks/use-novatempo-session";
+import { TEXTIQ } from "@/lib/textiq/brand";
+import { useTextiqSession } from "@/hooks/use-textiq-session";
 import { supabase } from "@/integrations/supabase/client";
 
-export default function NovaTempoApp() {
+export default function TextiqApp() {
   useReveal();
-  const { session, checkingSession, deviceId, usage, usageLoading, refreshUsage } = useNovaTempoSession();
+  const { session, checkingSession, deviceId, usage, usageLoading, refreshUsage } = useTextiqSession();
   const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     applySeo({
-      title: `App | ${NOVATEMPO.name}`,
-      description: NOVATEMPO.claim,
-      path: NOVATEMPO.routes.app,
+      title: `App | ${TEXTIQ.name}`,
+      description: TEXTIQ.claim,
+      path: TEXTIQ.routes.app,
       noIndex: true,
     });
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
-      <NovaTempoNavbar />
+      <TextiqNavbar />
       <main className="pt-32 pb-24 bg-navy">
         <div className="container-narrow">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -53,7 +53,7 @@ export default function NovaTempoApp() {
           </div>
 
           <div className="reveal mt-12">
-            <NovaTempoVisualizer
+            <TextiqVisualizer
               deviceId={deviceId}
               isLoggedIn={!!session}
               usage={usage}
@@ -64,8 +64,8 @@ export default function NovaTempoApp() {
           </div>
         </div>
       </main>
-      <NovaTempoFooter />
-      <NovaTempoAuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+      <TextiqFooter />
+      <TextiqAuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 }

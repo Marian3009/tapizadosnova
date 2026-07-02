@@ -196,8 +196,8 @@ export default function VisualizadorIA() {
           <div className="container-narrow">
             <p className="text-muted-foreground text-sm">
               ¿Tienes un negocio de tapicería, interiorismo o mobiliario?{" "}
-              <a href="/novatempo" className="text-gold font-medium hover:underline">
-                Descubre NovaTempo AI →
+              <a href="/textiq" className="text-gold font-medium hover:underline">
+                Descubre Textiq AI →
               </a>{" "}
               y ofrece esta misma tecnología a tus clientes con tu marca.
             </p>

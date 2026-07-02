@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { NOVATEMPO } from "@/lib/novatempo/brand";
+import { TEXTIQ } from "@/lib/textiq/brand";
 
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }
 
-export default function NovaTempoAuthDialog({ open, onOpenChange }: Props) {
+export default function TextiqAuthDialog({ open, onOpenChange }: Props) {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
@@ -28,7 +28,7 @@ export default function NovaTempoAuthDialog({ open, onOpenChange }: Props) {
           email,
           password: pwd,
           options: {
-            emailRedirectTo: `${window.location.origin}${NOVATEMPO.routes.app}`,
+            emailRedirectTo: `${window.location.origin}${TEXTIQ.routes.app}`,
             data: { business_name: businessName },
           },
         });
@@ -52,7 +52,7 @@ export default function NovaTempoAuthDialog({ open, onOpenChange }: Props) {
       <DialogContent className="max-w-sm bg-navy-deep border-gold/30 text-cream">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl text-cream">
-            {mode === "signup" ? `Crea tu cuenta en ${NOVATEMPO.short}` : "Entra en tu cuenta"}
+            {mode === "signup" ? `Crea tu cuenta en ${TEXTIQ.short}` : "Entra en tu cuenta"}
           </DialogTitle>
           <p className="text-cream/60 text-sm">
             {mode === "signup" ? "Empieza gratis, sin tarjeta." : "Accede para ver tu plan y tu uso."}
