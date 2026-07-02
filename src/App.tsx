@@ -4,6 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import VisualizadorIA from "./pages/VisualizadorIA.tsx";
+import TextiqLanding from "./pages/textiq/TextiqLanding.tsx";
+import TextiqPricing from "./pages/textiq/TextiqPricing.tsx";
+import TextiqApp from "./pages/textiq/TextiqApp.tsx";
 import Admin from "./pages/Admin.tsx";
 import Privacidad from "./pages/Privacidad.tsx";
 import AvisoLegal from "./pages/AvisoLegal.tsx";
@@ -23,6 +27,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/visualizador-ia" element={<VisualizadorIA />} />
+          <Route path="/textiq" element={<TextiqLanding />} />
+          <Route path="/textiq/precios" element={<TextiqPricing />} />
+          <Route path="/textiq/app" element={<TextiqApp />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/confirmar" element={<BlogConfirm />} />

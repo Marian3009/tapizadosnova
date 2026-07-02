@@ -53,6 +53,18 @@
     --gradient-navy: linear-gradient(180deg, hsl(222 17% 20%), hsl(222 17% 14%));
 
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Textiq AI palette — sand / cream / terracotta / black */
+    --tq-sand: 38 28% 88%;
+    --tq-cream: 38 22% 95%;
+    --tq-black: 0 0% 8%;
+    --tq-dark: 0 0% 5%;
+    --tq-terracotta: 15 55% 49%;
+    --tq-terracotta-foreground: 0 0% 100%;
+    --tq-terracotta-soft: 15 42% 60%;
+
+    --shadow-tq: 0 10px 30px -10px hsl(15 55% 49% / 0.4);
+    --shadow-tq-card: 0 8px 30px -10px hsl(0 0% 8% / 0.12);
   }
 }
 
@@ -91,6 +103,18 @@
   .reveal.in-view {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* Textiq scope — overrides shared component colors (SectionHeader, etc.) */
+  .textiq-scope {
+    --gold: var(--tq-terracotta);
+    --gold-foreground: var(--tq-terracotta-foreground);
+    --gold-soft: var(--tq-terracotta-soft);
+    --navy: var(--tq-black);
+    --navy-deep: var(--tq-dark);
+    --cream: var(--tq-sand);
+    --shadow-gold: var(--shadow-tq);
+    --shadow-card: var(--shadow-tq-card);
   }
 
   /* Blog article typography */

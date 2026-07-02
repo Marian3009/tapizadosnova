@@ -33,6 +33,17 @@ export default {
           deep: "hsl(var(--navy-deep))",
         },
         cream: "hsl(var(--cream))",
+        tq: {
+          sand: "hsl(var(--tq-sand))",
+          cream: "hsl(var(--tq-cream))",
+          black: "hsl(var(--tq-black))",
+          dark: "hsl(var(--tq-dark))",
+          terracotta: {
+            DEFAULT: "hsl(var(--tq-terracotta))",
+            foreground: "hsl(var(--tq-terracotta-foreground))",
+            soft: "hsl(var(--tq-terracotta-soft))",
+          },
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

@@ -18,6 +18,9 @@ const buttonVariants = cva(
         gold: "bg-gold text-navy font-semibold hover:bg-gold/90 shadow-[var(--shadow-gold)] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
         "outline-cream": "border-2 border-cream/80 text-cream bg-transparent hover:bg-cream hover:text-navy transition-all duration-300",
         "outline-gold": "border-2 border-gold text-gold bg-transparent hover:bg-gold hover:text-navy transition-all duration-300",
+        terracotta: "bg-tq-terracotta text-white font-semibold hover:bg-tq-terracotta/90 shadow-[var(--shadow-tq)] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+        "outline-terracotta": "border-2 border-tq-terracotta text-tq-terracotta bg-transparent hover:bg-tq-terracotta hover:text-white transition-all duration-300",
+        "outline-sand": "border-2 border-tq-sand/80 text-tq-sand bg-transparent hover:bg-tq-sand hover:text-tq-black transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",

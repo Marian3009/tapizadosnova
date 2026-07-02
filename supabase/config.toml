@@ -3,6 +3,18 @@ project_id = "kmiaethuwbmivsoeqxpo"
 [functions.analyze-furniture]
 verify_jwt = false
 
+[functions.textiq-generate]
+verify_jwt = false
+
+[functions.textiq-usage]
+verify_jwt = false
+
+[functions.textiq-create-checkout]
+verify_jwt = false
+
+[functions.textiq-stripe-webhook]
+verify_jwt = false
+
 [functions.process-email-queue]
 verify_jwt = true
 
