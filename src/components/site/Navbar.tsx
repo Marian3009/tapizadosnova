@@ -6,6 +6,7 @@ const links = [
   { href: "/#inicio", label: "Inicio" },
   { href: "/#servicios", label: "Servicios" },
   { href: "/#galeria", label: "Galería" },
+  { href: "/visualizador-ia", label: "Visualizador" },
   { href: "/#presupuesto", label: "Presupuesto" },
   { href: "/blog", label: "Blog" },
   { href: "/#contacto", label: "Contacto" },
@@ -35,12 +36,12 @@ export default function Navbar() {
           Tapizados <span className="italic font-normal">Nova</span>
         </a>
 
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-7">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm uppercase tracking-widest text-cream/90 hover:text-gold transition-colors duration-300"
+              className="text-sm uppercase tracking-widest text-cream/90 hover:text-gold transition-colors duration-300 whitespace-nowrap"
             >
               {l.label}
             </a>

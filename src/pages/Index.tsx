@@ -1,6 +1,7 @@
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
 import Services from "@/components/site/Services";
+import AIVisualizerTeaser from "@/components/site/AIVisualizerTeaser";
 import Calculator from "@/components/site/Calculator";
 import Gallery from "@/components/site/Gallery";
 import ArtempoSection from "@/components/site/ArtempoSection";
@@ -101,6 +102,7 @@ const Index = () => {
       <main>
         <Hero />
         <Services />
+        <AIVisualizerTeaser />
         <Calculator />
         <Gallery />
         <ArtempoSection />
